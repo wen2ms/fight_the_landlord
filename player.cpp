@@ -61,3 +61,41 @@ void Player::set_win(bool flag) {
 bool Player::is_win() {
     return is_win_;
 }
+
+void Player::set_prev_player(Player* player) {
+    prev_player_ = player;
+}
+
+void Player::set_next_player(Player* player) {
+    next_player_ = player;
+}
+
+Player* Player::prev_player() {
+    return prev_player_;
+}
+
+Player* Player::next_player() {
+    return next_player_;
+}
+
+void Player::bid_lord(int point) {}
+
+void Player::store_dealt_card(Card& card) {
+    cards_.add(card);
+}
+
+void Player::store_dealt_card(Cards& cards) {
+    cards_.add(cards);
+}
+
+Cards Player::cards() {
+    return cards_;
+}
+
+void Player::clear_cards() {
+    cards_.clear();
+}
+
+void Player::play_a_hand(Cards& cards) {
+    cards_.remove(cards);
+}
