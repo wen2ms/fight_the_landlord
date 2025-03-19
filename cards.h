@@ -32,6 +32,8 @@ class Cards {
     bool contains(const Card& card);
     bool contains(const Cards& cards);
     
+    Card take_random_card();
+    
   private:
     QSet<Card> cards_;
 };

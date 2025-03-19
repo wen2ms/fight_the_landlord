@@ -1,5 +1,7 @@
 #include "cards.h"
 
+#include <QRandomGenerator>
+
 Cards::Cards() {}
 
 void Cards::add(const Card& card) {
@@ -83,4 +85,19 @@ bool Cards::contains(const Card& card) {
 
 bool Cards::contains(const Cards& cards) {
     return cards_.contains(cards.cards_);
+}
+
+Card Cards::take_random_card() {
+    int random = QRandomGenerator::global()->bounded(cards_.size());
+    
+    QSet<Card>::const_iterator it = cards_.constBegin();
+    
+    for (int i = 0; i < random; ++i) {
+        ++it;
+    }
+    
+    Card card = *it;
+    
+    cards_.erase(it);
+    return card;
 }
