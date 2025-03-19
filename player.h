@@ -54,10 +54,16 @@ class Player : public QObject {
     
     void play_a_hand(Cards& cards);
     
+    void set_pending_info(Player* player, Cards& cards);
+    Cards pending_cards();
+    Player* pending_player();
+    
+    virtual void prepare_bid_lord();
+    virtual void prepare_play_a_hand();
     
   signals:
     
-  private:
+  protected:
     int score_;
     QString name_;
     Role role_;
@@ -69,7 +75,10 @@ class Player : public QObject {
     Player* prev_player_;
     Player* next_player_;
     
-    Cards cards_;    
+    Cards cards_;
+    
+    Cards pending_cards_;
+    Player* pending_player_;
 };
 
 #endif  // PLAYER_H

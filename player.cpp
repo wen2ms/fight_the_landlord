@@ -99,3 +99,20 @@ void Player::clear_cards() {
 void Player::play_a_hand(Cards& cards) {
     cards_.remove(cards);
 }
+
+void Player::set_pending_info(Player* player, Cards& cards) {
+    pending_player_ = player;
+    pending_cards_ = cards;
+}
+
+Cards Player::pending_cards() {
+    return pending_cards_;
+}
+
+Player* Player::pending_player() {
+    return pending_player_;
+}
+
+void Player::prepare_bid_lord() {}
+
+void Player::prepare_play_a_hand() {}
