@@ -13,7 +13,7 @@ class Card {
     };
     
     enum CardRank {
-        kPointBegin,
+        kRankBegin,
         kCard3,
         kCard4,
         kCard5,
@@ -29,15 +29,15 @@ class Card {
         kCard2,
         kCardSJ,
         kCardBJ,
-        kPointEnd
+        kRankEnd
     };
     
     Card();
     
     void set_suit(CardSuit suit);
     void set_rank(CardRank rank);
-    CardSuit suit();
-    CardRank rank();
+    CardSuit suit() const;
+    CardRank rank() const;
     
   private:
     CardSuit suit_;

@@ -10,10 +10,10 @@ void Card::set_rank(CardRank rank) {
     rank_ = rank;
 }
 
-Card::CardSuit Card::suit() {
+Card::CardSuit Card::suit() const {
     return suit_;
 }
 
-Card::CardRank Card::rank() {
+Card::CardRank Card::rank() const {
     return rank_;
 }

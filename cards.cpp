@@ -1,0 +1,86 @@
+#include "cards.h"
+
+Cards::Cards() {}
+
+void Cards::add(const Card& card) {
+    cards_.insert(card);    
+}
+
+void Cards::add(const Cards& cards) {
+    cards_.unite(cards.cards_);   
+}
+
+Cards& Cards::operator<<(const Card& card) {
+    add(card);
+    
+    return *this;
+}
+
+void Cards::remove(const Card& card) {
+    cards_.remove(card);
+}
+
+void Cards::remove(const Cards& cards) {
+    cards_.subtract(cards.cards_);
+}
+
+Cards& Cards::operator<<(const Cards& cards) {
+    add(cards);
+    
+    return *this;
+}
+
+int Cards::cards_count() {
+    return cards_.size();
+}
+
+bool Cards::is_empty() {
+    return cards_.isEmpty();
+}
+
+void Cards::clear() {
+    cards_.clear();
+}
+
+Card::CardRank Cards::max_rank() {
+    Card::CardRank maximum = Card::CardRank::kRankBegin;
+    
+    for (auto it = cards_.begin(); it != cards_.end(); ++it) {
+        if (it->rank() > maximum) {
+            maximum = it->rank();
+        }
+    }
+    
+    return maximum;
+}
+
+Card::CardRank Cards::min_rank() {
+    Card::CardRank minimum = Card::CardRank::kRankEnd;
+    
+    for (auto it = cards_.begin(); it != cards_.end(); ++it) {
+        if (it->rank() < minimum) {
+            minimum = it->rank();
+        }
+    }
+    
+    return minimum;
+}
+
+int Cards::rank_count(Card::CardRank rank) {
+    int count = 0;
+    for (auto it = cards_.begin(); it != cards_.end(); ++it) {
+        if (it->rank() > rank) {
+            count++;
+        }
+    }
+    
+    return count;
+}
+
+bool Cards::contains(const Card& card) {
+    return cards_.contains(card);
+}
+
+bool Cards::contains(const Cards& cards) {
+    return cards_.contains(cards.cards_);
+}
