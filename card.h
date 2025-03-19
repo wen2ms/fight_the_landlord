@@ -1,8 +1,12 @@
 #ifndef CARD_H
 #define CARD_H
 
+#include <QList>
+
 class Card {
   public:
+    using CardList = QList<Card>;
+    
     enum CardSuit {
         kSuitBegin,
         kHeart,
@@ -43,5 +47,8 @@ class Card {
     CardSuit suit_;
     CardRank rank_;
 };
+
+bool less_card(const Card& card1, const Card& card2);
+bool greater_card(const Card& card1, const Card& card2);
 
 #endif  // CARD_H

@@ -101,3 +101,19 @@ Card Cards::take_random_card() {
     cards_.erase(it);
     return card;
 }
+
+Card::CardList Cards::to_card_list(SortType type) {
+    Card::CardList card_list;
+    
+    for (auto it = cards_.begin(); it != cards_.end(); ++it) {
+        card_list.append(*it);
+    }
+    
+    if (type == kAscending) {
+        std::sort(card_list.begin(), card_list.end(), less_card);
+    } else if (type == kDescending) {
+        std::sort(card_list.begin(), card_list.end(), greater_card);
+    }
+    
+    return card_list;
+}

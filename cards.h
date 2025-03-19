@@ -7,6 +7,12 @@
 
 class Cards {
   public:
+    enum SortType {
+        kAscending,
+        kDescending,
+        kNoSorting
+    };
+    
     Cards();
     
     void add(const Card& card);
@@ -33,6 +39,8 @@ class Cards {
     bool contains(const Cards& cards);
     
     Card take_random_card();
+    
+    Card::CardList to_card_list(SortType type = kDescending);
     
   private:
     QSet<Card> cards_;
