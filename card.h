@@ -51,4 +51,7 @@ class Card {
 bool less_card(const Card& card1, const Card& card2);
 bool greater_card(const Card& card1, const Card& card2);
 
+bool operator==(const Card& left, const Card& right);
+uint qHash(const Card& card);
+
 #endif  // CARD_H

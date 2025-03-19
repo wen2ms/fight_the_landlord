@@ -33,3 +33,11 @@ bool greater_card(const Card& card1, const Card& card2) {
         return card1.rank() > card2.rank();
     }
 }
+
+bool operator==(const Card& left, const Card& right) {
+    return left.rank() == right.rank() && left.suit() == right.suit();
+}
+
+uint qHash(const Card& card) {
+    return card.rank() * 100 + card.suit();
+}
