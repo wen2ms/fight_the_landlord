@@ -63,3 +63,37 @@ Player *GameControl::pending_player() {
 Cards GameControl::pending_cards() {
     return pending_cards_;
 }
+
+void GameControl::init_all_cards() {
+    all_cards_.clear();
+    
+    for (int suit = Card::CardSuit::kSuitBegin + 1; suit < Card::CardSuit::kSuitEnd; ++suit) {
+        for (int rank = Card::CardRank::kRankBegin + 1; rank < Card::CardRank::kCardSJ; ++rank) {
+            Card card((Card::CardSuit)suit, (Card::CardRank)rank);
+            
+            all_cards_.add(card);
+        }
+    }
+    
+    all_cards_.add(Card(Card::CardSuit::kSuitBegin, Card::CardRank::kCardSJ));
+    all_cards_.add(Card(Card::CardSuit::kSuitBegin, Card::CardRank::kCardBJ));
+}
+
+Card GameControl::take_one_card() {
+    return all_cards_.take_random_card();   
+}
+
+Cards GameControl::take_remaining_cards() {
+    return all_cards_;
+}
+
+void GameControl::reset_all_cards() {
+    init_all_cards();
+    
+    left_robot_->clear_cards();
+    right_robot_->clear_cards();
+    user_player_->clear_cards();
+    
+    pending_player_ = nullptr;
+    pending_cards_.clear();
+}

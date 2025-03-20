@@ -37,6 +37,7 @@ class Card {
     };
     
     Card();
+    Card(CardSuit suit, CardRank rank);
     
     void set_suit(CardSuit suit);
     void set_rank(CardRank rank);

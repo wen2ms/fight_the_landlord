@@ -29,6 +29,13 @@ class GameControl : public QObject {
     
     Player* pending_player();
     Cards pending_cards();
+    
+    void init_all_cards();
+    
+    Card take_one_card();
+    Cards take_remaining_cards();
+    
+    void reset_all_cards();
 
   signals:
     
@@ -41,6 +48,8 @@ class GameControl : public QObject {
     
     Player* pending_player_;
     Cards pending_cards_;
+    
+    Cards all_cards_;
 };
 
 #endif  // GAMECONTROL_H

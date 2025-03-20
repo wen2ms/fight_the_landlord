@@ -2,6 +2,11 @@
 
 Card::Card() {}
 
+Card::Card(CardSuit suit, CardRank rank) {
+    set_suit(suit);
+    set_rank(rank);
+}
+
 void Card::set_suit(CardSuit suit) {
     suit_ = suit;
 }
