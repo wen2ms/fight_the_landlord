@@ -36,6 +36,12 @@ class GameControl : public QObject {
     Cards take_remaining_cards();
     
     void reset_all_cards();
+    
+    void start_bid_lord();
+    
+    void set_lord(Player* player);
+    
+    void clear_player_score();
 
   signals:
     

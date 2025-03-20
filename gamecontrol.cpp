@@ -97,3 +97,26 @@ void GameControl::reset_all_cards() {
     pending_player_ = nullptr;
     pending_cards_.clear();
 }
+
+void GameControl::start_bid_lord() {
+    current_player_->prepare_bid_lord();
+}
+
+void GameControl::set_lord(Player* player) {
+    player->set_role(Player::Role::kLord);
+    
+    player->prev_player()->set_role(Player::Role::kFarmer);
+    player->next_player()->set_role(Player::Role::kFarmer);
+    
+    current_player_ = player;
+    
+    player->store_dealt_card(all_cards_);
+    
+    current_player_->prepare_play_a_hand();
+}
+
+void GameControl::clear_player_score() {
+    left_robot_->set_score(0);
+    right_robot_->set_score(0);
+    user_player_->set_score(0);
+}
