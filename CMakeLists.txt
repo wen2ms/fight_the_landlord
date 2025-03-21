@@ -30,6 +30,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         robot.h robot.cpp
         userplayer.h userplayer.cpp
         gamecontrol.h gamecontrol.cpp
+        scorepanel.h scorepanel.cpp scorepanel.ui
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET fight_the_landlord APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -50,6 +51,7 @@ else()
 endif()
 
 target_link_libraries(fight_the_landlord PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_include_directories(fight_the_landlord PRIVATE ${PROJECT_SOURCE_DIR})
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
