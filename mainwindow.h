@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QPixmap>
 
+#include "gamecontrol.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -17,6 +19,10 @@ class MainWindow : public QMainWindow {
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     
+    void game_control_init();
+    
+    void update_scores();
+    
   protected:
     void paintEvent(QPaintEvent* event) override;
     
@@ -24,5 +30,8 @@ class MainWindow : public QMainWindow {
     Ui::MainWindow *ui;
     
     QPixmap background_image_;
+    
+    GameControl* game_control_;
+    QVector<Player*> player_list_;
 };
 #endif  // MAINWINDOW_H

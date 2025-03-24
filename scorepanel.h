@@ -13,6 +13,8 @@ class ScorePanel : public QWidget {
   public:
     explicit ScorePanel(QWidget *parent = nullptr);
     ~ScorePanel();
+    
+    void set_scores(int left_score, int right_score, int my_score);
 
   private:
     Ui::ScorePanel *ui;
