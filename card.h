@@ -9,9 +9,9 @@ class Card {
     
     enum CardSuit {
         kSuitBegin,
-        kHeart,
         kDiamond,
         kClub,
+        kHeart,
         kSpade,
         kSuitEnd
     };
