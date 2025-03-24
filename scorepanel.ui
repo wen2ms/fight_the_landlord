@@ -10,6 +10,12 @@
     <height>140</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <family>Academy Engraved LET</family>
+    <pointsize>14</pointsize>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -18,9 +24,9 @@
     <widget class="QLabel" name="label">
      <property name="font">
       <font>
-       <family>Arial</family>
-       <pointsize>12</pointsize>
-       <bold>true</bold>
+       <family>AppleGothic</family>
+       <pointsize>18</pointsize>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -35,9 +41,9 @@
     <widget class="QLabel" name="my_score">
      <property name="font">
       <font>
-       <family>Arial</family>
-       <pointsize>12</pointsize>
-       <bold>true</bold>
+       <family>AppleGothic</family>
+       <pointsize>18</pointsize>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -52,9 +58,9 @@
     <widget class="QLabel" name="label_3">
      <property name="font">
       <font>
-       <family>Arial</family>
-       <pointsize>12</pointsize>
-       <bold>true</bold>
+       <family>AppleGothic</family>
+       <pointsize>18</pointsize>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -69,9 +75,9 @@
     <widget class="QLabel" name="label_4">
      <property name="font">
       <font>
-       <family>Arial</family>
-       <pointsize>12</pointsize>
-       <bold>true</bold>
+       <family>AppleGothic</family>
+       <pointsize>18</pointsize>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -86,9 +92,9 @@
     <widget class="QLabel" name="left_score">
      <property name="font">
       <font>
-       <family>Arial</family>
-       <pointsize>12</pointsize>
-       <bold>true</bold>
+       <family>AppleGothic</family>
+       <pointsize>18</pointsize>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -103,9 +109,9 @@
     <widget class="QLabel" name="label_8">
      <property name="font">
       <font>
-       <family>Arial</family>
-       <pointsize>12</pointsize>
-       <bold>true</bold>
+       <family>AppleGothic</family>
+       <pointsize>18</pointsize>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -120,9 +126,9 @@
     <widget class="QLabel" name="label_5">
      <property name="font">
       <font>
-       <family>Arial</family>
-       <pointsize>12</pointsize>
-       <bold>true</bold>
+       <family>AppleGothic</family>
+       <pointsize>18</pointsize>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -137,9 +143,9 @@
     <widget class="QLabel" name="right_score">
      <property name="font">
       <font>
-       <family>Arial</family>
-       <pointsize>12</pointsize>
-       <bold>true</bold>
+       <family>AppleGothic</family>
+       <pointsize>18</pointsize>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -154,9 +160,9 @@
     <widget class="QLabel" name="label_9">
      <property name="font">
       <font>
-       <family>Arial</family>
-       <pointsize>12</pointsize>
-       <bold>true</bold>
+       <family>AppleGothic</family>
+       <pointsize>18</pointsize>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
