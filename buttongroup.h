@@ -11,10 +11,23 @@ class ButtonGroup : public QWidget {
     Q_OBJECT
 
   public:
+    enum Panel {kSatrt, KPlayACard, kPassOrPlay, kBidLoad, kEmpty};
+    
     explicit ButtonGroup(QWidget *parent = nullptr);
     ~ButtonGroup();
     
     void init_buttons();
+    
+    void select_panel(Panel panel_type);
+    
+  signals:
+    void start_game();
+    
+    void play_a_hand();
+    
+    void pass();
+    
+    void bid_points(int points);
 
   private:
     Ui::ButtonGroup *ui;

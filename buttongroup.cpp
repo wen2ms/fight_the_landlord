@@ -32,4 +32,26 @@ void ButtonGroup::init_buttons() {
     for (auto button : buttons) {
         button->setFixedSize(90, 45);
     }
+    
+    connect(ui->start, &MyButton::clicked, this, &ButtonGroup::start_game);
+    connect(ui->play_a_card, &MyButton::clicked, this, &ButtonGroup::play_a_hand);
+    connect(ui->play_a_card1, &MyButton::clicked, this, &ButtonGroup::play_a_hand);
+    connect(ui->pass, &MyButton::clicked, this, &ButtonGroup::pass);
+    
+    connect(ui->give_up, &MyButton::clicked, this, [=]() {
+        emit bid_points(0);
+    });
+    connect(ui->one_point, &MyButton::clicked, this, [=]() {
+        emit bid_points(1);
+    });
+    connect(ui->two_points, &MyButton::clicked, this, [=]() {
+        emit bid_points(2);
+    });
+    connect(ui->three_points, &MyButton::clicked, this, [=]() {
+        emit bid_points(3);
+    });
+}
+
+void ButtonGroup::select_panel(Panel panel_type) {
+    ui->stackedWidget->setCurrentIndex(panel_type);
 }
