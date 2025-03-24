@@ -13,6 +13,8 @@ class ButtonGroup : public QWidget {
   public:
     explicit ButtonGroup(QWidget *parent = nullptr);
     ~ButtonGroup();
+    
+    void init_buttons();
 
   private:
     Ui::ButtonGroup *ui;

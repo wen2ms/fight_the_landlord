@@ -50,7 +50,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="start">
+        <widget class="MyButton" name="start">
          <property name="text">
           <string>PushButton</string>
          </property>
@@ -87,7 +87,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="play_a_card">
+        <widget class="MyButton" name="play_a_card">
          <property name="text">
           <string>PushButton</string>
          </property>
@@ -124,7 +124,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="pass">
+        <widget class="MyButton" name="pass">
          <property name="text">
           <string>PushButton</string>
          </property>
@@ -147,7 +147,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="play_a_card1">
+        <widget class="MyButton" name="play_a_card1">
          <property name="text">
           <string>PushButton</string>
          </property>
@@ -184,7 +184,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="give_up">
+        <widget class="MyButton" name="give_up">
          <property name="text">
           <string>PushButton</string>
          </property>
@@ -207,7 +207,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="one_point">
+        <widget class="MyButton" name="one_point">
          <property name="text">
           <string>PushButton</string>
          </property>
@@ -230,7 +230,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="two_points">
+        <widget class="MyButton" name="two_points">
          <property name="text">
           <string>PushButton</string>
          </property>
@@ -253,7 +253,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="three_points">
+        <widget class="MyButton" name="three_points">
          <property name="text">
           <string>PushButton</string>
          </property>
@@ -279,6 +279,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MyButton</class>
+   <extends>QPushButton</extends>
+   <header>mybutton.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
