@@ -46,3 +46,11 @@ bool operator==(const Card& left, const Card& right) {
 uint qHash(const Card& card) {
     return card.rank() * 100 + card.suit();
 }
+
+bool operator<(const Card& left, const Card& right) {
+    if (left.rank() == right.rank()) {
+        return left.suit() > right.suit();
+    } else {
+        return left.rank() < right.rank();   
+    }
+}

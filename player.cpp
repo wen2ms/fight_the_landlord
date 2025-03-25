@@ -1,8 +1,11 @@
 #include "player.h"
 
-Player::Player(QObject *parent) : QObject{parent} {}
+Player::Player(QObject *parent) : QObject{parent} {
+    score_ = 0;
+    is_win_ = false;    
+}
 
-Player::Player(QString name, QObject *parent) {
+Player::Player(QString name, QObject *parent) : Player(parent) {
     name_ = name;
 }
 

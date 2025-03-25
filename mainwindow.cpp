@@ -24,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     init_cardmap();
     
     init_player_context();
+    
+    init_game_scene();
 }
 
 MainWindow::~MainWindow() {
@@ -140,6 +142,36 @@ void MainWindow::init_player_context() {
         context.role_image->move(role_image_pos[i]);
         
         context_map_.insert(player_list_.at(i), context);
+    }
+}
+
+void MainWindow::init_game_scene() {
+    base_card_ = new CardPanel(this);
+    base_card_->set_image(card_back_image_, card_back_image_);
+    
+    moving_card_ = new CardPanel(this);
+    moving_card_->set_image(card_back_image_, card_back_image_);
+    
+    for (int i = 0; i < 3; ++i) {
+        CardPanel* panel = new CardPanel(this);
+        
+        panel->set_image(card_back_image_, card_back_image_);
+        
+        last_three_cards_.push_back(panel);
+        
+        panel->hide();
+    }
+    
+    base_card_pos_ = QPoint((width() - card_size_.width()) / 2, (height() - card_size_.height()) / 2 - 100);
+    
+    base_card_->move(base_card_pos_);
+    moving_card_->move(base_card_pos_);
+    
+    int last_three_card_base = (width() - 3 * card_size_.width() - 2 * 10) / 2;
+    for (int i = 0; i < 3; ++i) {
+        last_three_cards_[i]->move(last_three_card_base + (card_size_.width() + 10) * i, 20);
+        
+        
     }
 }
 

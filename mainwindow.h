@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QPixmap>
 #include <QLabel>
+#include <QMap>
 
 #include "gamecontrol.h"
 #include "cardpanel.h"
@@ -32,6 +33,8 @@ class MainWindow : public QMainWindow {
     void init_buttons_group();
     
     void init_player_context();
+    
+    void init_game_scene();
     
   protected:
     void paintEvent(QPaintEvent* event) override;
@@ -62,5 +65,11 @@ class MainWindow : public QMainWindow {
     QPixmap card_back_image_;
     
     QMap<Player*, PlayerContext> context_map_;
+    
+    CardPanel* base_card_;
+    CardPanel* moving_card_;
+    QVector<CardPanel*> last_three_cards_;
+    
+    QPoint base_card_pos_;
 };
 #endif  // MAINWINDOW_H
