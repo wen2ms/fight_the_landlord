@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QPixmap>
+#include <QLabel>
 
 #include "gamecontrol.h"
 #include "cardpanel.h"
@@ -28,10 +29,27 @@ class MainWindow : public QMainWindow {
     
     void crop_image(QPixmap image, int x, int y, Card& card);
     
+    void init_buttons_group();
+    
+    void init_player_context();
+    
   protected:
     void paintEvent(QPaintEvent* event) override;
     
   private:
+    enum CardAlignment {kHorizontal, kVertical};
+    
+    struct PlayerContext {
+        QRect cards_rect;
+        QRect play_a_hand_rect;
+        CardAlignment alignment;
+        bool is_front_side;
+        QLabel* info;
+        
+        QLabel* role_image;
+        Cards last_cards;
+    };
+    
     Ui::MainWindow *ui;
     
     QPixmap background_image_;
@@ -42,5 +60,7 @@ class MainWindow : public QMainWindow {
     QMap<Card, CardPanel*> card_map_;
     QSize card_size_;
     QPixmap card_back_image_;
+    
+    QMap<Player*, PlayerContext> context_map_;
 };
 #endif  // MAINWINDOW_H
