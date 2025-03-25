@@ -5,6 +5,7 @@
 #include <QPixmap>
 #include <QLabel>
 #include <QMap>
+#include <QTimer>
 
 #include "gamecontrol.h"
 #include "cardpanel.h"
@@ -35,6 +36,14 @@ class MainWindow : public QMainWindow {
     void init_player_context();
     
     void init_game_scene();
+    
+    void game_status_process(GameControl::GameStatus status);
+    
+    void start_dealing_card();
+    
+    void card_move_step(Player* current_player, int current_card_pos);
+    
+    void on_deal_card();
     
   protected:
     void paintEvent(QPaintEvent* event) override;
@@ -71,5 +80,9 @@ class MainWindow : public QMainWindow {
     QVector<CardPanel*> last_three_cards_;
     
     QPoint base_card_pos_;
+    
+    GameControl::GameStatus game_status_;
+    
+    QTimer* timer_;
 };
 #endif  // MAINWINDOW_H

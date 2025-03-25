@@ -26,6 +26,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     init_player_context();
     
     init_game_scene();
+    
+    timer_ = new QTimer(this);
+    
+    connect(timer_, &QTimer::timeout, this, &MainWindow::on_deal_card);
 }
 
 MainWindow::~MainWindow() {
@@ -89,7 +93,13 @@ void MainWindow::init_buttons_group() {
     
     ui->button_group->select_panel(ButtonGroup::Panel::kSatrt);
     
-    connect(ui->button_group, &ButtonGroup::start_game, this, [=]() {});
+    connect(ui->button_group, &ButtonGroup::start_game, this, [=]() {
+        ui->button_group->select_panel(ButtonGroup::Panel::kEmpty);
+        game_control_->clear_player_score();
+        update_scores();
+        
+        game_status_process(GameControl::GameStatus::kDealingCard);
+    });
     connect(ui->button_group, &ButtonGroup::play_a_hand, this, [=]() {});
     connect(ui->button_group, &ButtonGroup::pass, this, [=]() {});
     connect(ui->button_group, &ButtonGroup::bid_points, this, [=]() {});
@@ -173,6 +183,106 @@ void MainWindow::init_game_scene() {
         
         
     }
+}
+
+void MainWindow::game_status_process(GameControl::GameStatus status) {
+    game_status_ = status;
+
+    switch (status) {
+        case GameControl::GameStatus::kDealingCard:
+            start_dealing_card();
+            break;
+        case GameControl::GameStatus::kBiddingCard:
+            break;
+        case GameControl::GameStatus::kPlayingAHand:
+            break;
+        default:
+            break;
+    }
+}
+
+void MainWindow::start_dealing_card() {
+    for (auto it = card_map_.begin(); it != card_map_.end(); ++it) {
+        it.value()->set_selected_side(false);
+        it.value()->set_front_side(false);
+        it.value()->hide();
+    }
+    
+    for (int i = 0; i < last_three_cards_.size(); ++i) {
+        last_three_cards_.at(i)->hide();
+    }
+    
+    int user_player_index = player_list_.indexOf(game_control_->user_player());
+    for (int i = 0; i < player_list_.size(); ++i) {
+        context_map_[player_list_.at(i)].last_cards.clear();
+        context_map_[player_list_.at(i)].info->hide();
+        context_map_[player_list_.at(i)].role_image->hide();
+        
+        context_map_[player_list_.at(i)].is_front_side = (i == user_player_index);
+    }
+    
+    game_control_->reset_all_cards();
+    
+    base_card_->show();
+    
+    ui->button_group->select_panel(ButtonGroup::Panel::kEmpty);
+    
+    timer_->start(15);
+}
+
+void MainWindow::card_move_step(Player* current_player, int current_card_pos) {
+    QRect card_rect = context_map_[current_player].cards_rect;
+    
+    int steps[] = {
+        (base_card_pos_.x() - card_rect.right()) / 100,
+        (card_rect.left() - base_card_pos_.x()) / 100,
+        (card_rect.top() - base_card_pos_.y()) / 100,
+    };
+    
+    QPoint pos[] = {
+        QPoint(base_card_pos_.x() - current_card_pos * steps[0], base_card_pos_.y()),
+        QPoint(base_card_pos_.x() + current_card_pos * steps[1], base_card_pos_.y()),
+        QPoint(base_card_pos_.x(), base_card_pos_.y() + current_card_pos * steps[2])
+    };
+    
+    int current_player_index = player_list_.indexOf(current_player);
+    moving_card_->move(pos[current_player_index]);
+    
+    if (current_card_pos == 0) {
+        moving_card_->show();
+    }
+    
+    if (current_card_pos == 100) {
+        moving_card_->hide();
+    }
+}
+
+void MainWindow::on_deal_card() {
+    static int current_card_pos = 0;
+    
+    Player* current_player = game_control_->current_player();
+    
+    if (current_card_pos >= 100) {
+        Card card = game_control_->take_one_card();
+        
+        current_player->store_dealt_card(card);
+        
+        game_control_->set_current_player(current_player->next_player());
+        
+        current_card_pos = 0;
+        
+        card_move_step(current_player, current_card_pos);
+        
+        if (game_control_->take_remaining_cards().cards_count() == 3) {
+            timer_->stop();
+            
+            game_status_process(GameControl::GameStatus::kBiddingCard);
+        }
+    }
+    
+    card_move_step(current_player, current_card_pos);
+    
+    current_card_pos += 15;
 }
 
 void MainWindow::paintEvent(QPaintEvent *event) {

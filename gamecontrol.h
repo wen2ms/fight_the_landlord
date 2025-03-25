@@ -10,6 +10,12 @@
 class GameControl : public QObject {
     Q_OBJECT
   public:
+    enum GameStatus {
+        kDealingCard,
+        kBiddingCard,
+        kPlayingAHand
+    };
+    
     enum PlayerStatus {
         kPrepareBidLord,
         kPreparePlayAHand,
