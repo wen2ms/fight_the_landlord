@@ -45,7 +45,9 @@ void MainWindow::game_control_init() {
     Robot* right_robot = game_control_->right_robot();
     UserPlayer* user_player = game_control_->user_player();
     
-    player_list_ << left_robot << right_robot << user_player;   
+    player_list_ << left_robot << right_robot << user_player;
+    
+    connect(game_control_, &GameControl::player_status_changed, this, &MainWindow::on_player_status_changed);    
 }
 
 void MainWindow::update_scores() {
@@ -190,8 +192,19 @@ void MainWindow::game_status_process(GameControl::GameStatus status) {
         case GameControl::GameStatus::kDealingCard:
             start_dealing_card();
             break;
-        case GameControl::GameStatus::kBiddingCard:
+        case GameControl::GameStatus::kBiddingCard: {
+            Card::CardList last_three_cards = game_control_->take_remaining_cards().to_card_list();
+            
+            for (int i = 0; i < last_three_cards.size(); ++i) {
+                QPixmap front = card_map_[last_three_cards.at(i)]->get_image();
+                last_three_cards_[i]->set_image(front, background_image_);
+                
+                last_three_cards_[i]->hide();
+            }
+            
+            game_control_->start_bid_lord();
             break;
+        }
         case GameControl::GameStatus::kPlayingAHand:
             break;
         default:
@@ -322,12 +335,27 @@ void MainWindow::on_deal_card() {
             timer_->stop();
             
             game_status_process(GameControl::GameStatus::kBiddingCard);
+            return;
         }
     }
     
     card_move_step(current_player, current_card_pos);
     
     current_card_pos += 15;
+}
+
+void MainWindow::on_player_status_changed(Player* player, GameControl::PlayerStatus status) {
+    switch (status) {
+        case GameControl::PlayerStatus::kPrepareBidLord:
+            if (player == game_control_->user_player()) {
+                ui->button_group->select_panel(ButtonGroup::Panel::kBidLoad);
+            }
+            break;
+        case GameControl::PlayerStatus::kPreparePlayAHand:
+            break;
+        case GameControl::PlayerStatus::kWin:
+            break;            
+    }
 }
 
 void MainWindow::paintEvent(QPaintEvent *event) {

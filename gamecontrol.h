@@ -50,6 +50,7 @@ class GameControl : public QObject {
     void clear_player_score();
 
   signals:
+    void player_status_changed(Player* player, PlayerStatus status);
     
   private:
     Robot* left_robot_;

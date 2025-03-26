@@ -49,6 +49,8 @@ class MainWindow : public QMainWindow {
     
     void on_deal_card();
     
+    void on_player_status_changed(Player* player, GameControl::PlayerStatus status);
+    
   protected:
     void paintEvent(QPaintEvent* event) override;
     

@@ -100,6 +100,8 @@ void GameControl::reset_all_cards() {
 
 void GameControl::start_bid_lord() {
     current_player_->prepare_bid_lord();
+    
+    emit player_status_changed(current_player_, PlayerStatus::kPrepareBidLord);
 }
 
 void GameControl::set_lord(Player* player) {
