@@ -43,7 +43,7 @@ class Player : public QObject {
     Player* prev_player();
     Player* next_player();
     
-    void bid_lord(int point);
+    void bid_lord(int points);
     
     void store_dealt_card(Card& card);
     void store_dealt_card(Cards& cards);
@@ -62,6 +62,7 @@ class Player : public QObject {
     virtual void prepare_play_a_hand();
     
   signals:
+    void notify_bid_lord(Player* player, int points);
     
   protected:
     int score_;

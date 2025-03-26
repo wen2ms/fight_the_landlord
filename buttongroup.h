@@ -11,7 +11,7 @@ class ButtonGroup : public QWidget {
     Q_OBJECT
 
   public:
-    enum Panel {kSatrt, KPlayACard, kPassOrPlay, kBidLoad, kEmpty};
+    enum Panel {kSatrt, KPlayACard, kPassOrPlay, kBidLord, kEmpty};
     
     explicit ButtonGroup(QWidget *parent = nullptr);
     ~ButtonGroup();

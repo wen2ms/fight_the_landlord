@@ -34,6 +34,10 @@ void GameControl::player_init() {
     right_robot_->set_next_player(left_robot_);
     
     current_player_ = user_player_;
+    
+    connect(user_player_, &UserPlayer::notify_bid_lord, this, &GameControl::on_bid_lord);
+    connect(left_robot_, &Robot::notify_bid_lord, this, &GameControl::on_bid_lord);
+    connect(right_robot_, &Robot::notify_bid_lord, this, &GameControl::on_bid_lord);
 }
 
 Robot *GameControl::left_robot() {
@@ -121,4 +125,38 @@ void GameControl::clear_player_score() {
     left_robot_->set_score(0);
     right_robot_->set_score(0);
     user_player_->set_score(0);
+}
+
+void GameControl::on_bid_lord(Player *player, int points) {
+    emit notify_bid_lord(player, points);
+    
+    if (points == 3) {
+        set_lord(player);
+        
+        bidding_record_.reset();
+        return;
+    }
+    
+    if (points > bidding_record_.points) {
+        bidding_record_.points = points;
+        bidding_record_.player = player;
+    }
+    
+    bidding_record_.bidding_times++;
+    
+    if (bidding_record_.bidding_times == 3) {
+        if (bidding_record_.points == 0) {
+            emit game_status_changed(GameStatus::kDealingCard);
+        } else {
+            set_lord(bidding_record_.player);
+        }
+        
+        bidding_record_.reset();
+        return;
+    }
+    
+    current_player_ = player->next_player();
+    
+    emit player_status_changed(current_player_, PlayerStatus::kPrepareBidLord);
+    current_player_->prepare_bid_lord();
 }

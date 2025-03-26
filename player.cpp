@@ -81,7 +81,9 @@ Player* Player::next_player() {
     return next_player_;
 }
 
-void Player::bid_lord(int point) {}
+void Player::bid_lord(int points) {
+    emit notify_bid_lord(this, points);
+}
 
 void Player::store_dealt_card(Card& card) {
     cards_.add(card);

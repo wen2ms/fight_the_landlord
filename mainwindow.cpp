@@ -104,7 +104,9 @@ void MainWindow::init_buttons_group() {
     });
     connect(ui->button_group, &ButtonGroup::play_a_hand, this, [=]() {});
     connect(ui->button_group, &ButtonGroup::pass, this, [=]() {});
-    connect(ui->button_group, &ButtonGroup::bid_points, this, [=]() {});
+    connect(ui->button_group, &ButtonGroup::bid_points, this, [=](int points) {
+        game_control_->user_player()->bid_lord(points);
+    });
 }
 
 void MainWindow::init_player_context() {
@@ -348,7 +350,7 @@ void MainWindow::on_player_status_changed(Player* player, GameControl::PlayerSta
     switch (status) {
         case GameControl::PlayerStatus::kPrepareBidLord:
             if (player == game_control_->user_player()) {
-                ui->button_group->select_panel(ButtonGroup::Panel::kBidLoad);
+                ui->button_group->select_panel(ButtonGroup::Panel::kBidLord);
             }
             break;
         case GameControl::PlayerStatus::kPreparePlayAHand:

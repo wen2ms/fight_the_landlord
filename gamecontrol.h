@@ -7,6 +7,22 @@
 #include "userplayer.h"
 #include "cards.h"
 
+struct BiddingRecord {
+    BiddingRecord() {
+        reset();
+    }
+    
+    void reset() {
+        player = nullptr;
+        points = 0;
+        bidding_times = 0;
+    }
+    
+    Player* player;
+    int points;
+    int bidding_times;
+};
+
 class GameControl : public QObject {
     Q_OBJECT
   public:
@@ -48,9 +64,15 @@ class GameControl : public QObject {
     void set_lord(Player* player);
     
     void clear_player_score();
+    
+    void on_bid_lord(Player* player, int points);
 
   signals:
     void player_status_changed(Player* player, PlayerStatus status);
+    
+    void notify_bid_lord(Player* player, int points);
+    
+    void game_status_changed(GameStatus status);
     
   private:
     Robot* left_robot_;
@@ -63,6 +85,8 @@ class GameControl : public QObject {
     Cards pending_cards_;
     
     Cards all_cards_;
+    
+    BiddingRecord bidding_record_;
 };
 
 #endif  // GAMECONTROL_H
