@@ -65,7 +65,7 @@ void MainWindow::init_cardmap() {
         for (int j = 0, rank = Card::CardRank::kRankBegin + 1; rank < Card::CardRank::kCardSJ; ++j, ++rank) {
             Card card((Card::CardSuit)suit, (Card::CardRank)rank);
             
-            crop_image(cards_image, card_size_.width() * i, card_size_.height() * j, card);
+            crop_image(cards_image, card_size_.width() * j, card_size_.height() * i, card);
         }
     }
     
@@ -180,8 +180,6 @@ void MainWindow::init_game_scene() {
     int last_three_card_base = (width() - 3 * card_size_.width() - 2 * 10) / 2;
     for (int i = 0; i < 3; ++i) {
         last_three_cards_[i]->move(last_three_card_base + (card_size_.width() + 10) * i, 20);
-        
-        
     }
 }
 
@@ -204,7 +202,7 @@ void MainWindow::game_status_process(GameControl::GameStatus status) {
 void MainWindow::start_dealing_card() {
     for (auto it = card_map_.begin(); it != card_map_.end(); ++it) {
         it.value()->set_selected_side(false);
-        it.value()->set_front_side(false);
+        it.value()->set_front_side(true);
         it.value()->hide();
     }
     
@@ -257,6 +255,49 @@ void MainWindow::card_move_step(Player* current_player, int current_card_pos) {
     }
 }
 
+void MainWindow::dealt_card_process(Player* player, Cards& cards) {
+    Card::CardList cards_list = cards.to_card_list();
+    for (int i = 0; i < cards_list.size(); ++i) {
+        CardPanel* panel = card_map_[cards_list.at(i)];
+        
+        panel->set_owner(player);
+    }
+    
+    update_player_cards(player);
+}
+
+void MainWindow::update_player_cards(Player* player) {
+    Cards cards = player->cards();
+    Card::CardList cards_list = cards.to_card_list();
+    
+    int card_space = 20;
+    QRect cards_rect = context_map_[player].cards_rect;
+    
+    for (int i = 0; i < cards_list.size(); ++i) {
+        CardPanel* panel = card_map_[cards_list.at(i)];
+        
+        panel->show();
+        panel->raise();
+        panel->set_front_side(context_map_[player].is_front_side);
+        
+        if (context_map_[player].alignment == CardAlignment::kHorizontal) {
+            int left = cards_rect.left() + (cards_rect.width() - (cards_list.size() - 1) * card_space - card_size_.width()) / 2;
+            int top = cards_rect.top() + (cards_rect.height() - card_size_.height()) / 2;
+            
+            if (panel->is_selected()) {
+                top -= 10;
+            }
+            
+            panel->move(left + card_space * i, top);
+        } else {
+            int left = cards_rect.left() + (cards_rect.width() - card_size_.width()) / 2;
+            int top = cards_rect.top() + (cards_rect.height() - (cards_list.size() - 1) * card_space - card_size_.height()) / 2;
+            
+            panel->move(left, top + card_space * i);
+        }
+    }
+}
+
 void MainWindow::on_deal_card() {
     static int current_card_pos = 0;
     
@@ -266,6 +307,10 @@ void MainWindow::on_deal_card() {
         Card card = game_control_->take_one_card();
         
         current_player->store_dealt_card(card);
+                
+        Cards cards(card);
+        
+        dealt_card_process(current_player, cards);
         
         game_control_->set_current_player(current_player->next_player());
         

@@ -43,6 +43,10 @@ class MainWindow : public QMainWindow {
     
     void card_move_step(Player* current_player, int current_card_pos);
     
+    void dealt_card_process(Player* player, Cards& cards);
+    
+    void update_player_cards(Player* player);
+    
     void on_deal_card();
     
   protected:

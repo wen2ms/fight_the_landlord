@@ -15,6 +15,8 @@ class Cards {
     
     Cards();
     
+    Cards(const Card& card);
+    
     void add(const Card& card);
     void add(const Cards& cards);
     
