@@ -40,10 +40,6 @@ class PlayAHand {
     PlayAHand(Cards& cards);
     PlayAHand(HandType type, Card::CardRank rank, int extra_info);
     
-    void classify(Cards& cards);
-    
-    void judge_card_type();
-    
     HandType hand_type();
     
     Card::CardRank card_rank();
@@ -51,6 +47,33 @@ class PlayAHand {
     int extra_info();
     
   private:
+    void classify(Cards& cards);
+    
+    void judge_card_type();
+    
+    bool is_single();
+    bool is_pair();
+    
+    bool is_triple();
+    bool is_triple_single();
+    bool is_triple_pair();
+    
+    bool is_plane();
+    bool is_plane_two_single();
+    bool is_plane_two_pair();
+    
+    bool is_seq_pair();
+    bool is_seq_single();
+    
+    bool is_bomb();
+    bool is_bomb_single();
+    bool is_bomb_pair();
+    bool is_bomb_two_single();
+    bool is_bomb_jokers();
+    bool is_bomb_jokers_single();
+    bool is_bomb_jokers_pair();
+    bool is_bomb_jokers_two_single();
+    
     HandType hand_type_;
     Card::CardRank card_rank_;
     int extra_info_;
