@@ -51,6 +51,8 @@ class MainWindow : public QMainWindow {
     
     void on_player_status_changed(Player* player, GameControl::PlayerStatus status);
     
+    void on_bid_lord(Player* player, int points, bool is_first_bidding);
+    
   protected:
     void paintEvent(QPaintEvent* event) override;
     

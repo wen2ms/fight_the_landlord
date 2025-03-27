@@ -52,6 +52,24 @@ void ButtonGroup::init_buttons() {
     });
 }
 
-void ButtonGroup::select_panel(Panel panel_type) {
+void ButtonGroup::select_panel(Panel panel_type, int bidding_points) {
     ui->stackedWidget->setCurrentIndex(panel_type);
+    
+    if (panel_type != Panel::kBidLord) {
+        return;
+    }
+    
+    if (bidding_points == 0) {
+        ui->one_point->setVisible(true);
+        ui->two_points->setVisible(true);
+        ui->three_points->setVisible(true);
+    } else if (bidding_points == 1) {
+        ui->one_point->setVisible(false);
+        ui->two_points->setVisible(true);
+        ui->three_points->setVisible(true);
+    } else if (bidding_points == 2) {
+        ui->one_point->setVisible(false);
+        ui->two_points->setVisible(false);
+        ui->three_points->setVisible(true);
+    }
 }

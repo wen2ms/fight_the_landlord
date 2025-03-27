@@ -47,7 +47,9 @@ void MainWindow::game_control_init() {
     
     player_list_ << left_robot << right_robot << user_player;
     
-    connect(game_control_, &GameControl::player_status_changed, this, &MainWindow::on_player_status_changed);    
+    connect(game_control_, &GameControl::player_status_changed, this, &MainWindow::on_player_status_changed);
+    connect(game_control_, &GameControl::notify_bid_lord, this, &MainWindow::on_bid_lord);
+    connect(game_control_, &GameControl::game_status_changed, this, &MainWindow::game_status_process);
 }
 
 void MainWindow::update_scores() {
@@ -350,7 +352,7 @@ void MainWindow::on_player_status_changed(Player* player, GameControl::PlayerSta
     switch (status) {
         case GameControl::PlayerStatus::kPrepareBidLord:
             if (player == game_control_->user_player()) {
-                ui->button_group->select_panel(ButtonGroup::Panel::kBidLord);
+                ui->button_group->select_panel(ButtonGroup::Panel::kBidLord, game_control_->max_bidding_points());
             }
             break;
         case GameControl::PlayerStatus::kPreparePlayAHand:
@@ -358,6 +360,22 @@ void MainWindow::on_player_status_changed(Player* player, GameControl::PlayerSta
         case GameControl::PlayerStatus::kWin:
             break;            
     }
+}
+
+void MainWindow::on_bid_lord(Player* player, int points, bool is_first_bidding) {
+    PlayerContext context = context_map_[player];
+    
+    if (points == 0) {
+        context.info->setPixmap(QPixmap(":/images/buqinag.png"));
+    } else {
+        if (is_first_bidding) {
+            context.info->setPixmap(QPixmap(":/images/jiaodizhu.png"));
+        } else {
+            context.info->setPixmap(QPixmap(":/images/qiangdizhu.png"));
+        }
+    }
+    
+    context.info->show();
 }
 
 void MainWindow::paintEvent(QPaintEvent *event) {

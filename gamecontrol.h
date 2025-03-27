@@ -65,12 +65,14 @@ class GameControl : public QObject {
     
     void clear_player_score();
     
+    int max_bidding_points();
+    
     void on_bid_lord(Player* player, int points);
 
   signals:
     void player_status_changed(Player* player, PlayerStatus status);
     
-    void notify_bid_lord(Player* player, int points);
+    void notify_bid_lord(Player* player, int points, bool is_first_bidding);
     
     void game_status_changed(GameStatus status);
     

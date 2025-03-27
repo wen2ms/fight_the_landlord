@@ -18,7 +18,7 @@ class ButtonGroup : public QWidget {
     
     void init_buttons();
     
-    void select_panel(Panel panel_type);
+    void select_panel(Panel panel_type, int bidding_points = 0);
     
   signals:
     void start_game();

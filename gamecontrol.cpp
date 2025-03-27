@@ -133,8 +133,18 @@ void GameControl::clear_player_score() {
     user_player_->set_score(0);
 }
 
+int GameControl::max_bidding_points() {
+    return bidding_record_.points;
+}
+
 void GameControl::on_bid_lord(Player *player, int points) {
-    emit notify_bid_lord(player, points);
+    if (points == 0 || bidding_record_.points >= points) {
+        emit notify_bid_lord(player, 0, false);
+    } else if (points > 0 && bidding_record_.points == 0) {
+        emit notify_bid_lord(player, points, true);
+    } else {
+        emit notify_bid_lord(player, points, false);
+    }
     
     if (points == 3) {
         set_lord(player);
