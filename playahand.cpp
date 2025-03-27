@@ -14,7 +14,35 @@ PlayAHand::PlayAHand(HandType type, Card::CardRank rank, int extra_info) {
     extra_info_ = extra_info;   
 }
 
-void PlayAHand::classify(Cards &cards) {}
+void PlayAHand::classify(Cards &cards) {
+    Card::CardList card_list = cards.to_card_list();
+    int card_record[Card::CardRank::kRankEnd];
+    
+    memset(card_record, 0, sizeof(int) * Card::CardRank::kRankEnd);
+    
+    for (int i = 0; i < card_list.size(); ++i) {
+        Card card = card_list.at(i);
+        
+        card_record[card.rank()]++;
+    }
+    
+    one_card_.clear();
+    two_card_.clear();
+    three_card_.clear();
+    four_card_.clear();
+    
+    for (int i = 0; i < Card::CardRank::kRankEnd; ++i) {
+        if (card_record[i] == 1) {
+            one_card_.push_back((Card::CardRank)i);
+        } else if (card_record[i] == 2) {
+            two_card_.push_back((Card::CardRank)i);
+        } else if (card_record[i] == 3) {
+            three_card_.push_back((Card::CardRank)i);
+        } else if (card_record[i] == 4) {
+            four_card_.push_back((Card::CardRank)i);
+        }
+    }
+}
 
 void PlayAHand::judge_card_type() {}
 

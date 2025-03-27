@@ -54,6 +54,11 @@ class PlayAHand {
     HandType hand_type_;
     Card::CardRank card_rank_;
     int extra_info_;
+    
+    QVector<Card::CardRank> one_card_;
+    QVector<Card::CardRank> two_card_;
+    QVector<Card::CardRank> three_card_;
+    QVector<Card::CardRank> four_card_;
 };
 
 #endif  // PLAYAHAND_H
