@@ -1,6 +1,7 @@
 #include "gamecontrol.h"
 
 #include <QRandomGenerator>
+#include <QTimer>
 
 GameControl::GameControl(QObject *parent) : QObject{parent} {}
 
@@ -118,7 +119,12 @@ void GameControl::set_lord(Player* player) {
     
     player->store_dealt_card(all_cards_);
     
-    current_player_->prepare_play_a_hand();
+    QTimer::singleShot(1000, this, [=]() {
+        emit game_status_changed(GameStatus::kPlayingAHand);
+        emit player_status_changed(player, PlayerStatus::kPreparePlayAHand);
+        
+        current_player_->prepare_play_a_hand();
+    });
 }
 
 void GameControl::clear_player_score() {
