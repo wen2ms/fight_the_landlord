@@ -2,6 +2,7 @@
 #define STRATEGY_H
 
 #include "player.h"
+#include "playahand.h"
 
 class Strategy {
   public:
@@ -13,7 +14,11 @@ class Strategy {
     
     Cards get_range_cards(Card::CardRank begin, Card::CardRank end);
     
+    QVector<Cards> find_cards_by_type(PlayAHand hand, bool beat);
+    
   private:
+    QVector<Cards> get_satisfied_cards(Card::CardRank rank_begin, int count);
+    
     Player* player_;
     Cards cards_;
 };

@@ -77,3 +77,52 @@ Cards Strategy::get_range_cards(Card::CardRank begin, Card::CardRank end) {
     
     return range_cards;
 }
+
+QVector<Cards> Strategy::find_cards_by_type(PlayAHand hand, bool beat) {
+    PlayAHand::HandType hand_type = hand.hand_type();
+    Card::CardRank card_rank = hand.card_rank();
+    int extra_info = hand.extra_info();
+    
+    Card::CardRank begin_rank = beat ? (Card::CardRank)(card_rank + 1) : Card::CardRank::kCard3;
+    
+    switch (hand_type) {
+        case PlayAHand::HandType::kHandSingle:
+            return get_satisfied_cards(begin_rank, 1);
+        case PlayAHand::HandType::kHandPair:
+            return get_satisfied_cards(begin_rank, 2);
+        case PlayAHand::HandType::kHandTriple:
+            return get_satisfied_cards(begin_rank, 3);
+        case PlayAHand::HandType::kHandTripleSingle:
+            break;
+        case PlayAHand::HandType::kHandTriplePair:
+            break;
+        case PlayAHand::HandType::kHandPlane:
+            break;
+        case PlayAHand::HandType::kHandPlaneTwoSingle:
+            break;
+        case PlayAHand::HandType::kHandPlaneTwoPair:
+            break;
+        case PlayAHand::HandType::kHandSeqPair:
+            break;
+        case PlayAHand::HandType::kHandSeqSingle:
+            break;
+        case PlayAHand::HandType::kHandBomb:
+            break;
+        default:
+            break;
+    }
+}
+
+QVector<Cards> Strategy::get_satisfied_cards(Card::CardRank rank_begin, int count) {
+    QVector<Cards> find_cards_list;
+    
+    for (int rank = rank_begin; rank < Card::CardRank::kRankEnd; ++rank) {
+        Cards cards = find_same_rank_cards((Card::CardRank)rank, count);
+        
+        if (!cards.is_empty()) {
+            find_cards_list << cards;   
+        }
+    }
+    
+    return find_cards_list;
+}
