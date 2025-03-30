@@ -19,6 +19,8 @@ class Strategy {
   private:
     QVector<Cards> get_satisfied_cards(Card::CardRank rank_begin, int count);
     
+    QVector<Cards> get_triple_single_or_pair(Card::CardRank rank_begin, PlayAHand::HandType hand_type);
+    
     Player* player_;
     Cards cards_;
 };

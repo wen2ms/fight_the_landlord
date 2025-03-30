@@ -25,6 +25,7 @@ class Cards {
     
     void remove(const Card& card);
     void remove(const Cards& cards);
+    void remove(const QVector<Cards>& cards_list);
     
     int cards_count();
     

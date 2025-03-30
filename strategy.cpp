@@ -93,9 +93,9 @@ QVector<Cards> Strategy::find_cards_by_type(PlayAHand hand, bool beat) {
         case PlayAHand::HandType::kHandTriple:
             return get_satisfied_cards(begin_rank, 3);
         case PlayAHand::HandType::kHandTripleSingle:
-            break;
+            return get_triple_single_or_pair(begin_rank, PlayAHand::HandType::kHandSingle);
         case PlayAHand::HandType::kHandTriplePair:
-            break;
+            return get_triple_single_or_pair(begin_rank, PlayAHand::HandType::kHandPair);
         case PlayAHand::HandType::kHandPlane:
             break;
         case PlayAHand::HandType::kHandPlaneTwoSingle:
@@ -121,6 +121,30 @@ QVector<Cards> Strategy::get_satisfied_cards(Card::CardRank rank_begin, int coun
         
         if (!cards.is_empty()) {
             find_cards_list << cards;   
+        }
+    }
+    
+    return find_cards_list;
+}
+
+QVector<Cards> Strategy::get_triple_single_or_pair(Card::CardRank rank_begin, PlayAHand::HandType hand_type) {
+    QVector<Cards> find_cards_list = get_satisfied_cards(rank_begin, 3);
+    
+    if (!find_cards_list.empty()) {
+        Cards remain_cards = cards_;
+        
+        remain_cards.remove(find_cards_list);
+        
+        Strategy strategy(player_, remain_cards);
+        QVector<Cards> cards_list = strategy.find_cards_by_type(PlayAHand(hand_type, Card::CardRank::kRankBegin, 0),
+                                                                false);
+        
+        if (!cards_list.empty()) {
+            for (int i = 0; i < find_cards_list.size(); ++i) {
+                find_cards_list[i].add(cards_list[0]);
+            }
+        } else {
+            find_cards_list.clear();
         }
     }
     

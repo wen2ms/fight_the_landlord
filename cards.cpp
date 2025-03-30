@@ -30,6 +30,12 @@ void Cards::remove(const Cards& cards) {
     cards_.subtract(cards.cards_);
 }
 
+void Cards::remove(const QVector<Cards>& cards_list) {
+    for (int i = 0; i < cards_list.size(); ++i) {
+        remove(cards_list.at(i));
+    }
+}
+
 Cards& Cards::operator<<(const Cards& cards) {
     add(cards);
     
