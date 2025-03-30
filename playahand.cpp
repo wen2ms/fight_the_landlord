@@ -112,6 +112,35 @@ int PlayAHand::extra_info() {
     return extra_info_;
 }
 
+bool PlayAHand::can_beat(const PlayAHand &other) {
+    if (hand_type_ == HandType::kHandUnknown) {
+        return false;
+    }
+    
+    if (other.hand_type_ == HandType::kHandPass) {
+        return true;
+    }
+    
+    if (hand_type_ == HandType::kHandBombJokers) {
+        return true;
+    }
+    
+    if (hand_type_ == HandType::kHandBomb && other.hand_type_ >= HandType::kHandSingle
+        && other.hand_type_ <= HandType::kHandSeqSingle) {
+        return true;
+    }
+    
+    if (hand_type_ == other.hand_type_) {
+        if (hand_type_ == HandType::kHandPair || hand_type_ == HandType::kHandSingle) {
+            return card_rank_ > other.card_rank_ && extra_info_ == other.extra_info_;
+        } else {
+            return card_rank_ > other.card_rank_;
+        }
+    }
+    
+    return false;
+}
+
 bool PlayAHand::is_single() {
     if (one_card_.size() == 1 && two_card_.empty() && three_card_.empty() && four_card_.empty()) {
         return true;

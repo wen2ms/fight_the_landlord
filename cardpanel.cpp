@@ -52,7 +52,6 @@ Player* CardPanel::get_owner() {
 }
 
 void CardPanel::paintEvent(QPaintEvent* event) {
-    
     QPainter painter(this);
     
     if (is_front_) {

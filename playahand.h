@@ -46,6 +46,8 @@ class PlayAHand {
     
     int extra_info();
     
+    bool can_beat(const PlayAHand& other);
+    
   private:
     void classify(Cards& cards);
     
