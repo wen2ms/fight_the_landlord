@@ -53,6 +53,8 @@ class PlayAHand {
     
     void judge_card_type();
     
+    bool is_pass();
+    
     bool is_single();
     bool is_pair();
     

@@ -48,7 +48,9 @@ void PlayAHand::judge_card_type() {
     hand_type_ = HandType::kHandUnknown;
     card_rank_ = Card::CardRank::kRankBegin;
     
-    if (is_single()) {
+    if (is_pass()) {
+        hand_type_ = HandType::kHandPass;
+    } else if (is_single()) {
         hand_type_ = HandType::kHandSingle;
         card_rank_ = one_card_[0];
     } else if (is_pair()) {
@@ -136,6 +138,14 @@ bool PlayAHand::can_beat(const PlayAHand &other) {
         } else {
             return card_rank_ > other.card_rank_;
         }
+    }
+    
+    return false;
+}
+
+bool PlayAHand::is_pass() {
+    if (one_card_.empty() && two_card_.empty() && three_card_.empty() && four_card_.empty()) {
+        return true;
     }
     
     return false;
