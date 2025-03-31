@@ -83,33 +83,53 @@ QVector<Cards> Strategy::find_cards_by_type(PlayAHand hand, bool beat) {
     Card::CardRank card_rank = hand.card_rank();
     int extra_info = hand.extra_info();
     
-    Card::CardRank begin_rank = beat ? (Card::CardRank)(card_rank + 1) : Card::CardRank::kCard3;
+    Card::CardRank rank_begin = beat ? (Card::CardRank)(card_rank + 1) : Card::CardRank::kCard3;
     
     switch (hand_type) {
         case PlayAHand::HandType::kHandSingle:
-            return get_satisfied_cards(begin_rank, 1);
+            return get_satisfied_cards(rank_begin, 1);
         case PlayAHand::HandType::kHandPair:
-            return get_satisfied_cards(begin_rank, 2);
+            return get_satisfied_cards(rank_begin, 2);
         case PlayAHand::HandType::kHandTriple:
-            return get_satisfied_cards(begin_rank, 3);
+            return get_satisfied_cards(rank_begin, 3);
         case PlayAHand::HandType::kHandTripleSingle:
-            return get_triple_single_or_pair(begin_rank, PlayAHand::HandType::kHandSingle);
+            return get_triple_single_or_pair(rank_begin, PlayAHand::HandType::kHandSingle);
         case PlayAHand::HandType::kHandTriplePair:
-            return get_triple_single_or_pair(begin_rank, PlayAHand::HandType::kHandPair);
+            return get_triple_single_or_pair(rank_begin, PlayAHand::HandType::kHandPair);
         case PlayAHand::HandType::kHandPlane:
-            return get_plane(begin_rank);
+            return get_plane(rank_begin);
         case PlayAHand::HandType::kHandPlaneTwoSingle:
-            return get_plane_two_single_or_two_pair(begin_rank, PlayAHand::HandType::kHandSingle);
+            return get_plane_two_single_or_two_pair(rank_begin, PlayAHand::HandType::kHandSingle);
         case PlayAHand::HandType::kHandPlaneTwoPair:
-            return get_plane_two_single_or_two_pair(begin_rank, PlayAHand::HandType::kHandPair);
-        case PlayAHand::HandType::kHandSeqPair:
-            break;
-        case PlayAHand::HandType::kHandSeqSingle:
-            break;
+            return get_plane_two_single_or_two_pair(rank_begin, PlayAHand::HandType::kHandPair);
+        case PlayAHand::HandType::kHandSeqPair: {
+            SeqCardsInfo info;
+            info.rank_begin = rank_begin;
+            info.rank_end = Card::CardRank::kCardQ;
+            info.search_number = 2;
+            info.base_count = 3;
+            info.extra_info = extra_info;
+            info.beat = beat;
+            info.get_base_seq = &Strategy::get_base_seq_pair;
+            
+            return get_seq_pair_or_seq_single(info);
+        }
+        case PlayAHand::HandType::kHandSeqSingle: {
+            SeqCardsInfo info;
+            info.rank_begin = rank_begin;
+            info.rank_end = Card::CardRank::kCard10;
+            info.search_number = 1;
+            info.base_count = 5;
+            info.extra_info = extra_info;
+            info.beat = beat;
+            info.get_base_seq = &Strategy::get_base_seq_single;
+            
+            return get_seq_pair_or_seq_single(info);
+        }
         case PlayAHand::HandType::kHandBomb:
-            break;
+            return get_bomb(rank_begin);
         default:
-            break;
+            return QVector<Cards>();
     }
 }
 
@@ -191,6 +211,109 @@ QVector<Cards> Strategy::get_plane_two_single_or_two_pair(Card::CardRank rank_be
             }
         } else {
             find_cards_list.clear();
+        }
+    }
+    
+    return find_cards_list;
+}
+
+QVector<Cards> Strategy::get_seq_pair_or_seq_single(SeqCardsInfo& info) {
+    QVector<Cards> find_cards_list;
+    
+    if (info.beat) {
+        for (int rank = info.rank_begin; rank <= info.rank_end; ++rank) {            
+            if (rank + info.extra_info > Card::CardRank::kCard2) {
+                break;
+            }
+            
+            bool is_found = false;
+            Cards seq_cards;
+            for (int i = 0; i < info.extra_info; ++i) {
+                Cards cards = find_same_rank_cards((Card::CardRank)(rank + i), info.search_number);
+                
+                if (cards.is_empty()) {
+                    is_found = false;
+                    seq_cards.clear();
+                    break;
+                } else {
+                    seq_cards << cards;
+                }
+            }
+            
+            if (is_found) {
+                find_cards_list << seq_cards;
+                return find_cards_list;
+            }
+        }
+    } else {
+        for (int rank = info.rank_begin; rank <= info.rank_end; ++rank) {
+            Cards base_seq_cards = (this->*info.get_base_seq)((Card::CardRank)rank);
+            
+            if (base_seq_cards.is_empty()) {
+                continue;
+            }
+            
+            find_cards_list << base_seq_cards;
+            
+            int followed_rank = rank + info.base_count;
+            
+            while (true) {
+                if (followed_rank >= Card::CardRank::kCard2) {
+                    break;
+                }
+                
+                Cards followed_cards = find_same_rank_cards((Card::CardRank)followed_rank, info.search_number);
+                
+                if (followed_cards.is_empty()) {
+                    break;
+                } else {
+                    base_seq_cards << followed_cards;
+                    find_cards_list << base_seq_cards;
+                    followed_rank++;
+                }
+            }
+        }
+    }
+    
+    return find_cards_list;
+}
+
+Cards Strategy::get_base_seq_pair(Card::CardRank rank) {
+    Cards base_cards0 = find_same_rank_cards(rank, 2);
+    Cards base_cards1 = find_same_rank_cards((Card::CardRank)(rank + 1), 2);
+    Cards base_cards2 = find_same_rank_cards((Card::CardRank)(rank + 2), 2);
+    Cards base_seq;
+    
+    if (!base_cards0.is_empty() && !base_cards1.is_empty() && !base_cards1.is_empty()) {
+        base_seq << base_cards0 << base_cards1 << base_cards2;
+    }
+    
+    return base_seq;
+}
+
+Cards Strategy::get_base_seq_single(Card::CardRank rank) {
+    Cards base_cards0 = find_same_rank_cards(rank, 1);
+    Cards base_cards1 = find_same_rank_cards((Card::CardRank)(rank + 1), 1);
+    Cards base_cards2 = find_same_rank_cards((Card::CardRank)(rank + 2), 1);
+    Cards base_cards3 = find_same_rank_cards((Card::CardRank)(rank + 3), 1);
+    Cards base_cards4 = find_same_rank_cards((Card::CardRank)(rank + 4), 1);
+    Cards base_seq;
+    
+    if (!base_cards0.is_empty() && !base_cards1.is_empty() && !base_cards1.is_empty()) {
+        base_seq << base_cards0 << base_cards1 << base_cards2 << base_cards3 << base_cards4;
+    }
+    
+    return base_seq;
+}
+
+QVector<Cards> Strategy::get_bomb(Card::CardRank rank_begin) {
+    QVector<Cards> find_cards_list;
+    
+    for (int rank = rank_begin; rank < Card::CardRank::kRankEnd; ++rank) {
+        Cards cards = find_same_rank_cards((Card::CardRank)rank, 4);
+        
+        if (!cards.is_empty()) {
+            find_cards_list << cards;
         }
     }
     

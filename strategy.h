@@ -17,6 +17,17 @@ class Strategy {
     QVector<Cards> find_cards_by_type(PlayAHand hand, bool beat);
     
   private:
+    using seq_cards_function = Cards (Strategy::*)(Card::CardRank rank);
+    struct SeqCardsInfo {
+        Card::CardRank rank_begin;
+        Card::CardRank rank_end;
+        int extra_info;
+        bool beat;
+        int search_number;
+        int base_count;
+        seq_cards_function get_base_seq;
+    };
+    
     QVector<Cards> get_satisfied_cards(Card::CardRank rank_begin, int count);
     
     QVector<Cards> get_triple_single_or_pair(Card::CardRank rank_begin, PlayAHand::HandType hand_type);
@@ -24,6 +35,13 @@ class Strategy {
     QVector<Cards> get_plane(Card::CardRank rank_begin);
     
     QVector<Cards> get_plane_two_single_or_two_pair(Card::CardRank rank_begin, PlayAHand::HandType hand_type);
+    
+    QVector<Cards> get_seq_pair_or_seq_single(SeqCardsInfo& info);
+    
+    Cards get_base_seq_pair(Card::CardRank rank);
+    Cards get_base_seq_single(Card::CardRank rank);
+    
+    QVector<Cards> get_bomb(Card::CardRank rank_begin);
         
     Player* player_;
     Cards cards_;
