@@ -97,11 +97,11 @@ QVector<Cards> Strategy::find_cards_by_type(PlayAHand hand, bool beat) {
         case PlayAHand::HandType::kHandTriplePair:
             return get_triple_single_or_pair(begin_rank, PlayAHand::HandType::kHandPair);
         case PlayAHand::HandType::kHandPlane:
-            break;
+            return get_plane(begin_rank);
         case PlayAHand::HandType::kHandPlaneTwoSingle:
-            break;
+            return get_plane_two_single_or_two_pair(begin_rank, PlayAHand::HandType::kHandSingle);
         case PlayAHand::HandType::kHandPlaneTwoPair:
-            break;
+            return get_plane_two_single_or_two_pair(begin_rank, PlayAHand::HandType::kHandPair);
         case PlayAHand::HandType::kHandSeqPair:
             break;
         case PlayAHand::HandType::kHandSeqSingle:
@@ -142,6 +142,52 @@ QVector<Cards> Strategy::get_triple_single_or_pair(Card::CardRank rank_begin, Pl
         if (!cards_list.empty()) {
             for (int i = 0; i < find_cards_list.size(); ++i) {
                 find_cards_list[i].add(cards_list[0]);
+            }
+        } else {
+            find_cards_list.clear();
+        }
+    }
+    
+    return find_cards_list;
+}
+
+QVector<Cards> Strategy::get_plane(Card::CardRank rank_begin) {
+    QVector<Cards> find_cards_list;
+    
+    for (int rank = rank_begin; rank <= Card::CardRank::kCardK; ++rank) {
+        Cards prev_cards = find_same_rank_cards((Card::CardRank)rank, 3);
+        Cards next_cards = find_same_rank_cards((Card::CardRank)(rank + 1), 3);
+        
+        if (!prev_cards.is_empty() && !next_cards.is_empty()) {
+            Cards cards;
+            
+            cards << prev_cards << next_cards;
+            find_cards_list << cards;
+        }
+    }
+    
+    return find_cards_list;
+}
+
+QVector<Cards> Strategy::get_plane_two_single_or_two_pair(Card::CardRank rank_begin, PlayAHand::HandType hand_type) {
+    QVector<Cards> find_cards_list = get_plane(rank_begin);
+    
+    if (!find_cards_list.empty()) {
+        Cards remain_cards = cards_;
+        
+        remain_cards.remove(find_cards_list);
+        
+        Strategy strategy(player_, remain_cards);
+        QVector<Cards> cards_list = strategy.find_cards_by_type(PlayAHand(hand_type, Card::CardRank::kRankBegin, 0),
+                                                                false);
+        
+        if (cards_list.size() >= 2) {
+            for (int i = 0; i < find_cards_list.size(); ++i) {
+                Cards cards;
+                
+                cards << cards_list[0] << cards_list[1];
+                
+                find_cards_list[i].add(cards);
             }
         } else {
             find_cards_list.clear();

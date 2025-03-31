@@ -21,6 +21,10 @@ class Strategy {
     
     QVector<Cards> get_triple_single_or_pair(Card::CardRank rank_begin, PlayAHand::HandType hand_type);
     
+    QVector<Cards> get_plane(Card::CardRank rank_begin);
+    
+    QVector<Cards> get_plane_two_single_or_two_pair(Card::CardRank rank_begin, PlayAHand::HandType hand_type);
+        
     Player* player_;
     Cards cards_;
 };
