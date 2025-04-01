@@ -26,7 +26,62 @@ Cards Strategy::make_strategy() {
 
 Cards Strategy::first_play() {}
 
-Cards Strategy::get_greater_cards(PlayAHand hand) {}
+Cards Strategy::get_greater_cards(PlayAHand hand) {
+    Player* pending_player = player_->pending_player();
+    
+    if (pending_player->role() != player_->role() && pending_player->cards().cards_count() <= 3) {
+        QVector<Cards> bombs = find_cards_by_count(4);
+        
+        for (int i = 0; i < bombs.size(); ++i) {
+            if (PlayAHand(bombs[i]).can_beat(hand)) {
+                return bombs[i];
+            }
+        }
+        
+        Cards sj_card = find_same_rank_cards(Card::CardRank::kCardSJ, 1);
+        Cards bj_card = find_same_rank_cards(Card::CardRank::kCardBJ, 1);
+        
+        if (!sj_card.is_empty() && !bj_card.is_empty()) {
+            Cards joker_bomb;
+            
+            joker_bomb << sj_card << bj_card;
+            return joker_bomb;
+        }
+    }
+    
+    Player* next_player = player_->next_player();
+    Cards remaining_cards = cards_;
+    
+    // cards_.remove();
+    
+    auto find_beat_card = std::bind([=](Cards& cards) {
+        QVector<Cards> beat_cards_list = Strategy(player_, cards).find_cards_by_type(hand, true);
+        
+        if (!beat_cards_list.empty()) {
+            if (pending_player->role() != player_->role() && next_player->cards().cards_count() <= 2) {
+                return beat_cards_list.back();
+            } else {
+                return beat_cards_list.front();
+            }
+        }
+        
+        return Cards();
+    }, std::placeholders::_1);
+    
+    Cards cards = find_beat_card(remaining_cards);
+    
+    if (!cards.is_empty()) {
+        return cards;
+    } else {
+        cards = find_beat_card(cards_);
+        
+        if (!cards.is_empty()) {
+            return cards;
+        }
+    }
+    
+    return Cards();
+}
 
 bool Strategy::whether_to_beat(Cards& beat_cards) {
     if (beat_cards.is_empty()) {
@@ -195,11 +250,11 @@ QVector<Cards> Strategy::find_cards_by_type(PlayAHand hand, bool beat) {
 QVector<Cards> Strategy::get_satisfied_cards(Card::CardRank rank_begin, int count) {
     QVector<Cards> find_cards_list;
     
-    for (int rank = rank_begin; rank < Card::CardRank::kRankEnd; ++rank) {
-        Cards cards = find_same_rank_cards((Card::CardRank)rank, count);
-        
-        if (!cards.is_empty()) {
-            find_cards_list << cards;   
+    for (int rank = rank_begin; rank < Card::CardRank::kRankEnd; ++rank) {    
+        if (cards_.rank_count((Card::CardRank)rank) == count) {
+            Cards cards = find_same_rank_cards((Card::CardRank)rank, count);
+            
+            find_cards_list << cards;
         }
     }
     
