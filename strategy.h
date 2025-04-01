@@ -8,6 +8,14 @@ class Strategy {
   public:
     Strategy(Player* player, const Cards& cards);
     
+    Cards make_strategy();
+    
+    Cards first_play();
+    
+    Cards get_greater_cards(PlayAHand hand);
+    
+    bool whether_to_beat(Cards& cards);
+    
     Cards find_same_rank_cards(Card::CardRank rank, int count);
     
     QVector<Cards> find_cards_by_count(int count);

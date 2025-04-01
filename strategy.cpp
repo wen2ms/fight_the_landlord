@@ -5,6 +5,31 @@ Strategy::Strategy(Player *player, const Cards &cards) {
     cards_ = cards;
 }
 
+Cards Strategy::make_strategy() {
+    Player* pending_player = player_->pending_player();
+    Cards pending_cards = player_->pending_cards();
+    
+    if (pending_player == player_ || pending_player == nullptr) {
+        return first_play();
+    } else {
+        PlayAHand hand(pending_cards);
+        Cards beat_cards = get_greater_cards(hand);
+        bool is_to_beat = whether_to_beat(beat_cards);
+        
+        if (is_to_beat) {
+            return beat_cards;
+        } else {
+            return Cards();
+        }   
+    }
+}
+
+Cards Strategy::first_play() {}
+
+Cards Strategy::get_greater_cards(PlayAHand hand) {}
+
+bool Strategy::whether_to_beat(Cards &cards) {}
+
 Cards Strategy::find_same_rank_cards(Card::CardRank rank, int count) {
     if (count < 1 || count > 4) {
         return Cards();
