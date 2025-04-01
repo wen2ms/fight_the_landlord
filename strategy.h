@@ -14,7 +14,7 @@ class Strategy {
     
     Cards get_greater_cards(PlayAHand hand);
     
-    bool whether_to_beat(Cards& cards);
+    bool whether_to_beat(Cards& beat_cards);
     
     Cards find_same_rank_cards(Card::CardRank rank, int count);
     

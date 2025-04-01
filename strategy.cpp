@@ -28,7 +28,41 @@ Cards Strategy::first_play() {}
 
 Cards Strategy::get_greater_cards(PlayAHand hand) {}
 
-bool Strategy::whether_to_beat(Cards &cards) {}
+bool Strategy::whether_to_beat(Cards& beat_cards) {
+    if (beat_cards.is_empty()) {
+        return false;
+    }
+    
+    Player* pending_player = player_->pending_player();
+    if (pending_player->role() == player_->role()) {
+        Cards remaining_cards = cards_;
+        
+        remaining_cards.remove(beat_cards);
+        if (PlayAHand(remaining_cards).hand_type() != PlayAHand::HandType::kHandUnknown) {
+            return true;
+        }
+        
+        Card::CardRank beat_card_rank = PlayAHand(beat_cards).card_rank();
+        if (beat_card_rank == Card::CardRank::kCard2 || beat_card_rank == Card::CardRank::kCardSJ
+            || beat_card_rank == Card::CardRank::kCardBJ) {
+            return false;
+        }
+    } else {
+        PlayAHand hand(beat_cards);
+        
+        if ((hand.hand_type() == PlayAHand::HandType::kHandTripleSingle || hand.hand_type() == PlayAHand::HandType::kHandTriplePair)
+            && hand.card_rank() == Card::CardRank::kCard2) {
+            return false;
+        }
+        
+        if (hand.hand_type() == PlayAHand::HandType::kHandPair && hand.card_rank() == Card::CardRank::kCard2
+            && pending_player->cards().cards_count() >= 10 && player_->cards().cards_count() >= 5) {
+            return false;
+        }
+    }
+    
+    return true;
+}
 
 Cards Strategy::find_same_rank_cards(Card::CardRank rank, int count) {
     if (count < 1 || count > 4) {
