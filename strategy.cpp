@@ -247,6 +247,29 @@ QVector<Cards> Strategy::find_cards_by_type(PlayAHand hand, bool beat) {
     }
 }
 
+void Strategy::pick_seq_singles(QVector<QVector<Cards> >& all_seq_list_record, QVector<Cards>& current_seq_single_list,
+                                const Cards& cards) {
+    QVector<Cards> all_seq_list = Strategy(player_, cards).find_cards_by_type(PlayAHand(PlayAHand::HandType::kHandSeqSingle,
+                                                                                        Card::CardRank::kRankBegin, 0), false);
+    
+    if (all_seq_list.empty()) {
+        all_seq_list_record << current_seq_single_list;
+    } else {
+        Cards current_cards = cards;
+        for (int i = 0; i < all_seq_list.size(); ++i) {
+            Cards seq = all_seq_list.at(i);
+            
+            Cards remaining_cards = current_cards;
+            remaining_cards.remove(seq);
+            
+            QVector<Cards> seq_single_list = current_seq_single_list;
+            seq_single_list << seq;
+            
+            pick_seq_singles(all_seq_list_record, seq_single_list, remaining_cards);
+        }
+    }
+}
+
 QVector<Cards> Strategy::get_satisfied_cards(Card::CardRank rank_begin, int count) {
     QVector<Cards> find_cards_list;
     

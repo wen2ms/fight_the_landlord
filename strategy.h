@@ -24,6 +24,8 @@ class Strategy {
     
     QVector<Cards> find_cards_by_type(PlayAHand hand, bool beat);
     
+    void pick_seq_singles(QVector<QVector<Cards>>& all_seq_list_record, QVector<Cards>& current_seq_single_list, const Cards& cards);
+    
   private:
     using seq_cards_function = Cards (Strategy::*)(Card::CardRank rank);
     struct SeqCardsInfo {
