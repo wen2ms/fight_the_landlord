@@ -48,7 +48,156 @@ Cards Strategy::first_play() {
         }
     }
     
-    return 
+    bool has_plane = false;
+    bool has_triple = false;
+    bool has_seq_pair = false;
+    
+    Cards filtered_cards = cards_;
+    
+    QVector<Cards> bomb_list = find_cards_by_type(PlayAHand(PlayAHand::HandType::kHandBomb, Card::CardRank::kRankBegin, 0),
+                                                  false);
+    filtered_cards.remove(bomb_list);
+    
+    QVector<Cards> plane_list = Strategy(player_, filtered_cards).find_cards_by_type(PlayAHand(PlayAHand::HandType::kHandPlane,
+                                                                                               Card::CardRank::kRankBegin, 0),
+                                                                                     false);
+    if (!plane_list.empty()) {
+        has_plane = true;
+        filtered_cards.remove(plane_list);           
+    }
+    
+    QVector<Cards> triple_list = Strategy(player_, filtered_cards).find_cards_by_type(PlayAHand(PlayAHand::HandType::kHandTriple,
+                                                                                               Card::CardRank::kRankBegin, 0),
+                                                                                     false);
+    if (!triple_list.empty()) {
+        has_triple = true;
+        filtered_cards.remove(triple_list);           
+    }
+    
+    QVector<Cards> seq_pair_list = Strategy(player_, filtered_cards).find_cards_by_type(PlayAHand(PlayAHand::HandType::kHandSeqPair,
+                                                                                               Card::CardRank::kRankBegin, 0),
+                                                                                     false);
+    if (!seq_pair_list.empty()) {
+        has_seq_pair = true;
+        filtered_cards.remove(seq_pair_list);           
+    }
+    
+    if (has_seq_pair) {
+        Cards max_seq_pair;
+        for (int i = 0; i < seq_pair_list.size(); ++i) {
+            if (seq_pair_list[i].cards_count() > max_seq_pair.cards_count()) {
+                max_seq_pair = seq_pair_list[i];
+            }
+        }
+        
+        return max_seq_pair;
+    }
+    
+    if (has_plane) {
+        bool has_two_pair = false;
+        QVector<Cards> pair_list;
+        
+        for (int rank = Card::CardRank::kCard3; rank <= Card::CardRank::kCard10; ++rank) {
+            Cards pair = Strategy(player_, filtered_cards).find_same_rank_cards((Card::CardRank)rank, 2);
+            if (!pair.is_empty()) {
+                pair_list << pair;
+                
+                if (pair_list.size() == 2) {
+                    has_two_pair = true;
+                    break;
+                }
+            }
+        }
+        
+        if (has_two_pair) {
+            Cards plane_two_pair = plane_list[0];
+            plane_two_pair << pair_list[0] << pair_list[1];
+            
+            return plane_two_pair;
+        } else {
+            bool has_two_single = false;
+            QVector<Cards> two_single_list;
+            
+            for (int rank = Card::CardRank::kCard3; rank <= Card::CardRank::kCard10; ++rank) {
+                if (filtered_cards.rank_count((Card::CardRank)rank) == 1) {
+                    Cards two_single = Strategy(player_, filtered_cards).find_same_rank_cards((Card::CardRank)rank, 1);
+                    if (!two_single.is_empty()) {
+                        two_single_list << two_single;
+                        
+                        if (two_single_list.size() == 2) {
+                            has_two_single = true;
+                            break;
+                        }
+                    }   
+                }
+            }
+            
+            if (has_two_single) {
+                Cards plane_two_single = plane_list[0];
+                plane_two_single << pair_list[0] << pair_list[1];
+                
+                return plane_two_single;
+            } else {
+                return plane_list[0];
+            }
+        }
+    }
+    
+    if (has_triple) {
+        if (PlayAHand(triple_list[0]).card_rank() < Card::kCardA) {
+            for (int rank = Card::CardRank::kCard3; rank <= Card::CardRank::kCardA; ++rank) {
+                int rank_count = filtered_cards.rank_count((Card::CardRank)rank);
+                if (rank_count == 1) {
+                    Cards single = Strategy(player_, filtered_cards).find_same_rank_cards((Card::CardRank)rank, 1);
+                    Cards triple_single = triple_list[0];
+                    
+                    triple_single.add(single);
+                    
+                    return triple_single;
+                } else if (rank_count == 2) {
+                    Cards pair = Strategy(player_, filtered_cards).find_same_rank_cards((Card::CardRank)rank, 2);
+                    Cards triple_pair= triple_list[0];
+                    
+                    triple_pair.add(pair);
+                    
+                    return triple_pair;
+                }
+            }
+        }
+        
+        return triple_list[0];
+    }
+    
+    Player* next_player = player_->next_player();
+    if (next_player->role() != player_->role() && next_player->cards().cards_count() == 1) {
+        for (int rank = Card::CardRank::kCardBJ; rank >= Card::CardRank::kCard3; --rank) {
+            int rank_count = filtered_cards.rank_count((Card::CardRank)rank);
+            if (rank_count == 1) {
+                Cards single = Strategy(player_, filtered_cards).find_same_rank_cards((Card::CardRank)rank, 1);
+                
+                return single;
+            } else if (rank_count == 2) {
+                Cards pair = Strategy(player_, filtered_cards).find_same_rank_cards((Card::CardRank)rank, 2);
+                
+                return pair;
+            }
+        }
+    } else {
+        for (int rank = Card::CardRank::kCard3; rank < Card::CardRank::kRankEnd; ++rank) {
+            int rank_count = filtered_cards.rank_count((Card::CardRank)rank);
+            if (rank_count == 1) {
+                Cards single = Strategy(player_, filtered_cards).find_same_rank_cards((Card::CardRank)rank, 1);
+                
+                return single;
+            } else if (rank_count == 2) {
+                Cards pair = Strategy(player_, filtered_cards).find_same_rank_cards((Card::CardRank)rank, 2);
+                
+                return pair;
+            }
+        }
+    }
+    
+    return Cards();
 }
 
 Cards Strategy::get_greater_cards(PlayAHand hand) {
