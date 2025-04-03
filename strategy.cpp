@@ -26,7 +26,30 @@ Cards Strategy::make_strategy() {
     }
 }
 
-Cards Strategy::first_play() {}
+Cards Strategy::first_play() {
+    PlayAHand hand(cards_);
+    
+    if (hand.hand_type() != PlayAHand::HandType::kHandUnknown) {
+        return cards_;
+    }
+    
+    QVector<Cards> optimal_seq_single = pick_optimal_seq_singles();
+    
+    if (!optimal_seq_single.empty()) {
+        int original_singles_count = find_cards_by_count(1).size();
+        
+        Cards remaining_cards = cards_;
+        remaining_cards.remove(optimal_seq_single);
+        
+        int removed_singles_count = Strategy(player_, remaining_cards).find_cards_by_count(1).size();
+        
+        if (removed_singles_count < original_singles_count) {
+            return optimal_seq_single[0];
+        }
+    }
+    
+    return 
+}
 
 Cards Strategy::get_greater_cards(PlayAHand hand) {
     Player* pending_player = player_->pending_player();
@@ -276,7 +299,11 @@ QVector<Cards> Strategy::pick_optimal_seq_singles() {
     QVector<QVector<Cards>> all_seq_list_record;
     QVector<Cards> current_seq_single_list;
     
-    Strategy(player_, cards_).pick_seq_singles(all_seq_list_record, current_seq_single_list, cards_);
+    Cards filter_cards = cards_;
+    filter_cards.remove(find_cards_by_count(4));
+    filter_cards.remove(find_cards_by_count(3));
+    
+    pick_seq_singles(all_seq_list_record, current_seq_single_list, filter_cards);
     
     if (all_seq_list_record.empty()) {
         return QVector<Cards>();
