@@ -26,6 +26,8 @@ class Strategy {
     
     void pick_seq_singles(QVector<QVector<Cards>>& all_seq_list_record, QVector<Cards>& current_seq_single_list, const Cards& cards);
     
+    QVector<Cards> pick_optimal_seq_singles();
+    
   private:
     using seq_cards_function = Cards (Strategy::*)(Card::CardRank rank);
     struct SeqCardsInfo {

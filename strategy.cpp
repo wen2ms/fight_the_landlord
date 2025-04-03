@@ -1,5 +1,7 @@
 #include "strategy.h"
 
+#include <QMap>
+
 Strategy::Strategy(Player *player, const Cards &cards) {
     player_ = player;
     cards_ = cards;
@@ -52,7 +54,7 @@ Cards Strategy::get_greater_cards(PlayAHand hand) {
     Player* next_player = player_->next_player();
     Cards remaining_cards = cards_;
     
-    // cards_.remove();
+    remaining_cards.remove(Strategy(player_, remaining_cards).pick_optimal_seq_singles());
     
     auto find_beat_card = std::bind([=](Cards& cards) {
         QVector<Cards> beat_cards_list = Strategy(player_, cards).find_cards_by_type(hand, true);
@@ -268,6 +270,51 @@ void Strategy::pick_seq_singles(QVector<QVector<Cards> >& all_seq_list_record, Q
             pick_seq_singles(all_seq_list_record, seq_single_list, remaining_cards);
         }
     }
+}
+
+QVector<Cards> Strategy::pick_optimal_seq_singles() {
+    QVector<QVector<Cards>> all_seq_list_record;
+    QVector<Cards> current_seq_single_list;
+    
+    Strategy(player_, cards_).pick_seq_singles(all_seq_list_record, current_seq_single_list, cards_);
+    
+    if (all_seq_list_record.empty()) {
+        return QVector<Cards>();
+    }
+    
+    QMap<int, int> remaining_rank_map;
+    for (int i = 0; i < all_seq_list_record.size(); ++i) {
+        Cards remaining_cards = cards_;
+        QVector<Cards> seq_single_list = all_seq_list_record.at(i);
+        
+        remaining_cards.remove(seq_single_list);
+        
+        QVector<Cards> single_list = Strategy(player_, remaining_cards).find_cards_by_count(1);
+        Card::CardList card_list;
+        
+        for (int j = 0; j < single_list.size(); ++j) {
+            card_list << single_list[j].to_card_list();
+        }
+        
+        int remaining_single_total_rank = 0;
+        for (int j = 0; j < card_list.size(); ++j) {
+            remaining_single_total_rank += card_list[j].rank() + 15;
+        }
+        
+        remaining_rank_map.insert(i, remaining_single_total_rank);
+    }
+    
+    int optimal_seq_index = 0;
+    int min_remaining_total_rank = INT16_MAX;
+    
+    for (auto it = remaining_rank_map.constBegin(); it != remaining_rank_map.constEnd(); ++it) {
+        if (it.value() < min_remaining_total_rank) {
+            min_remaining_total_rank = it.value();
+            optimal_seq_index = it.key();
+        }
+    }
+    
+    return all_seq_list_record[optimal_seq_index];
 }
 
 QVector<Cards> Strategy::get_satisfied_cards(Card::CardRank rank_begin, int count) {
