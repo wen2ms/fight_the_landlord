@@ -3,6 +3,8 @@
 #include <QRandomGenerator>
 #include <QTimer>
 
+#include "playahand.h"
+
 GameControl::GameControl(QObject *parent) : QObject{parent} {}
 
 void GameControl::player_init() {
@@ -39,6 +41,14 @@ void GameControl::player_init() {
     connect(user_player_, &UserPlayer::notify_bid_lord, this, &GameControl::on_bid_lord);
     connect(left_robot_, &Robot::notify_bid_lord, this, &GameControl::on_bid_lord);
     connect(right_robot_, &Robot::notify_bid_lord, this, &GameControl::on_bid_lord);
+    
+    connect(this, &GameControl::pending_info, user_player_, &UserPlayer::set_pending_info);
+    connect(this, &GameControl::pending_info, left_robot_, &Robot::set_pending_info);
+    connect(this, &GameControl::pending_info, right_robot_, &Robot::set_pending_info);
+    
+    connect(user_player_, &UserPlayer::notify_play_a_hand, this, &GameControl::on_play_a_hand);
+    connect(left_robot_, &Robot::notify_play_a_hand, this, &GameControl::on_play_a_hand);
+    connect(right_robot_, &Robot::notify_play_a_hand, this, &GameControl::on_play_a_hand);
 }
 
 Robot *GameControl::left_robot() {
@@ -109,7 +119,9 @@ void GameControl::start_bid_lord() {
     emit player_status_changed(current_player_, PlayerStatus::kPrepareBidLord);
 }
 
-void GameControl::set_lord(Player* player) {
+void GameControl::set_lord(Player* player, int points) {
+    bid_points_ = points;
+    
     player->set_role(Player::Role::kLord);
     
     player->prev_player()->set_role(Player::Role::kFarmer);
@@ -147,7 +159,7 @@ void GameControl::on_bid_lord(Player *player, int points) {
     }
     
     if (points == 3) {
-        set_lord(player);
+        set_lord(player, points);
         
         bidding_record_.reset();
         return;
@@ -164,7 +176,7 @@ void GameControl::on_bid_lord(Player *player, int points) {
         if (bidding_record_.points == 0) {
             emit game_status_changed(GameStatus::kDealingCard);
         } else {
-            set_lord(bidding_record_.player);
+            set_lord(bidding_record_.player, bidding_record_.points);
         }
         
         bidding_record_.reset();
@@ -175,4 +187,61 @@ void GameControl::on_bid_lord(Player *player, int points) {
     
     emit player_status_changed(current_player_, PlayerStatus::kPrepareBidLord);
     current_player_->prepare_bid_lord();
+}
+
+void GameControl::on_play_a_hand(Player *player, Cards &cards) {
+    emit notify_play_a_hand(player, cards);
+    
+    if (!cards.is_empty()) {
+        pending_cards_ = cards;
+        pending_player_ = player;
+        
+        emit pending_info(player, cards);
+    }
+    
+    PlayAHand::HandType hand_type = PlayAHand(cards).hand_type();
+    
+    if (hand_type == PlayAHand::HandType::kHandBomb || hand_type == PlayAHand::HandType::kHandBombJokers) {
+        bid_points_ *= 2;
+    }
+    
+    if (player->cards().is_empty()) {
+        Player* prev_player = player->prev_player();
+        Player* next_player = player->next_player();
+        
+        if (player->role() == Player::Role::kLord) {
+            player->set_score(player->score() + 2 * bid_points_);
+            prev_player->set_score(prev_player->score() - bid_points_);
+            next_player->set_score(next_player->score() - bid_points_);
+            
+            player->set_win(true);
+            prev_player->set_win(false);
+            next_player->set_win(false);
+        } else {
+            player->set_win(true);
+            player->set_score(player->score() + bid_points_);
+            
+            if (prev_player->role() == Player::Role::kLord) {
+                prev_player->set_score(prev_player->score() - 2 * bid_points_);
+                next_player->set_score(next_player->score() + bid_points_);
+                
+                prev_player->set_win(false);
+                next_player->set_win(true);
+            } else {
+                prev_player->set_score(prev_player->score() + bid_points_);
+                next_player->set_score(next_player->score() - 2 * bid_points_);
+                
+                prev_player->set_win(true);
+                next_player->set_win(false);
+            }
+        }
+        
+        emit player_status_changed(player, GameControl::PlayerStatus::kWin);
+        return;
+    }
+    
+    current_player_ = player->next_player();
+    current_player_->prepare_play_a_hand();
+    
+    emit player_status_changed(current_player_, GameControl::PlayerStatus::kPreparePlayAHand);
 }

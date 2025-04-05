@@ -61,7 +61,7 @@ class GameControl : public QObject {
     
     void start_bid_lord();
     
-    void set_lord(Player* player);
+    void set_lord(Player* player, int points);
     
     void clear_player_score();
     
@@ -78,6 +78,10 @@ class GameControl : public QObject {
     
     void game_status_changed(GameStatus status);
     
+    void notify_play_a_hand(Player* player, Cards& cards);
+    
+    void pending_info(Player* player, Cards& cards);
+    
   private:
     Robot* left_robot_;
     Robot* right_robot_;
@@ -91,6 +95,8 @@ class GameControl : public QObject {
     Cards all_cards_;
     
     BiddingRecord bidding_record_;
+    
+    int bid_points_;
 };
 
 #endif  // GAMECONTROL_H
