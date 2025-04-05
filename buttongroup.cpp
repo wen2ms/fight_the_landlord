@@ -29,8 +29,8 @@ void ButtonGroup::init_buttons() {
     buttons << ui->start << ui->play_a_card << ui->play_a_card1 << ui->pass << ui->give_up << ui->one_point
             << ui->two_points << ui->three_points;
     
-    for (auto button : buttons) {
-        button->setFixedSize(90, 45);
+    for (int i = 0; i < buttons.size(); ++i) {
+        buttons[i]->setFixedSize(90, 45);
     }
     
     connect(ui->start, &MyButton::clicked, this, &ButtonGroup::start_game);

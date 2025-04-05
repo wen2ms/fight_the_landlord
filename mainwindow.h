@@ -9,6 +9,7 @@
 
 #include "gamecontrol.h"
 #include "cardpanel.h"
+#include "animationwindow.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -20,6 +21,15 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
   public:
+    enum AnimationType {
+        kSeqSingle,
+        kSeqPair,
+        kPlane,
+        kJockerBomb,
+        kBomb,
+        kBidPoints
+    };
+    
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     
@@ -52,6 +62,8 @@ class MainWindow : public QMainWindow {
     void on_player_status_changed(Player* player, GameControl::PlayerStatus status);
     
     void on_bid_lord(Player* player, int points, bool is_first_bidding);
+    
+    void show_animatiion(AnimationType type, int points = 0);
     
   protected:
     void paintEvent(QPaintEvent* event) override;
@@ -92,5 +104,7 @@ class MainWindow : public QMainWindow {
     GameControl::GameStatus game_status_;
     
     QTimer* timer_;
+    
+    AnimationWindow* animation_window_;
 };
 #endif  // MAINWINDOW_H

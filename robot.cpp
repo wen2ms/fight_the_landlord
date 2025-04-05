@@ -7,12 +7,13 @@ Robot::Robot(QObject *parent) : Player{parent} {
     type_ = kRobot;
 }
 
-void Robot::prepare_bid_lord() {}
-
-void Robot::prepare_play_a_hand() {
+void Robot::prepare_bid_lord() {
     RobotBidLord* subthread = new RobotBidLord(this);
     
     subthread->start();
+}
+
+void Robot::prepare_play_a_hand() {
 }
 
 void Robot::thinking_bid_lord() {

@@ -30,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     timer_ = new QTimer(this);
     
     connect(timer_, &QTimer::timeout, this, &MainWindow::on_deal_card);
+    
+    animation_window_ = new AnimationWindow(this);
 }
 
 MainWindow::~MainWindow() {
@@ -108,6 +110,7 @@ void MainWindow::init_buttons_group() {
     connect(ui->button_group, &ButtonGroup::pass, this, [=]() {});
     connect(ui->button_group, &ButtonGroup::bid_points, this, [=](int points) {
         game_control_->user_player()->bid_lord(points);
+        ui->button_group->select_panel(ButtonGroup::Panel::kEmpty);
     });
 }
 
@@ -178,7 +181,7 @@ void MainWindow::init_game_scene() {
         panel->hide();
     }
     
-    base_card_pos_ = QPoint((width() - card_size_.width()) / 2, (height() - card_size_.height()) / 2 - 100);
+    base_card_pos_ = QPoint((width() - card_size_.width()) / 2, height() / 2 - 100);
     
     base_card_->move(base_card_pos_);
     moving_card_->move(base_card_pos_);
@@ -242,7 +245,7 @@ void MainWindow::start_dealing_card() {
     
     ui->button_group->select_panel(ButtonGroup::Panel::kEmpty);
     
-    timer_->start(15);
+    timer_->start(10);
 }
 
 void MainWindow::card_move_step(Player* current_player, int current_card_pos) {
@@ -376,6 +379,30 @@ void MainWindow::on_bid_lord(Player* player, int points, bool is_first_bidding) 
     }
     
     context.info->show();
+    
+    show_animatiion(AnimationType::kBidPoints, points);
+}
+
+void MainWindow::show_animatiion(AnimationType type, int points) {
+    switch(type) {
+        case AnimationType::kSeqSingle:
+            break;
+        case AnimationType::kSeqPair:
+            break;
+        case AnimationType::kPlane:
+            break;
+        case AnimationType::kJockerBomb:
+            break;
+        case AnimationType::kBomb:
+            break;
+        case AnimationType::kBidPoints:
+            animation_window_->setFixedSize(160, 98);
+            animation_window_->move((width() - animation_window_->width()) / 2, (height() - animation_window_->height()) / 2 - 200);
+            animation_window_->show_bid_points(points);
+            break;
+    }
+    
+    animation_window_->show();
 }
 
 void MainWindow::paintEvent(QPaintEvent *event) {
