@@ -38,6 +38,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         strategy.h strategy.cpp
         robotbidlord.h robotbidlord.cpp
         animationwindow.h animationwindow.cpp
+        robotplayahand.h robotplayahand.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET fight_the_landlord APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

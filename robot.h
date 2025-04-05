@@ -16,6 +16,7 @@ class Robot : public Player {
     void prepare_play_a_hand() override;
     
     void thinking_bid_lord();
+    void thinking_play_a_hand();
 };
 
 #endif  // ROBOT_H

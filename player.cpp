@@ -103,6 +103,8 @@ void Player::clear_cards() {
 
 void Player::play_a_hand(Cards& cards) {
     cards_.remove(cards);
+    
+    emit notify_play_a_hand(this, cards);
 }
 
 void Player::set_pending_info(Player* player, Cards& cards) {

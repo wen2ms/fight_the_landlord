@@ -2,6 +2,7 @@
 
 #include "strategy.h"
 #include "robotbidlord.h"
+#include "robotplayahand.h"
 
 Robot::Robot(QObject *parent) : Player{parent} {
     type_ = kRobot;
@@ -14,6 +15,9 @@ void Robot::prepare_bid_lord() {
 }
 
 void Robot::prepare_play_a_hand() {
+    RobotPlayAHand* subthread = new RobotPlayAHand(this);
+    
+    subthread->start();
 }
 
 void Robot::thinking_bid_lord() {
@@ -58,4 +62,12 @@ void Robot::thinking_bid_lord() {
     } else {
         bid_lord(0);
     }
+}
+
+void Robot::thinking_play_a_hand() {
+    Strategy strategy(this, cards_);
+    
+    Cards cards = strategy.make_strategy();
+    
+    play_a_hand(cards);
 }

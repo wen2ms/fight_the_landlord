@@ -64,6 +64,8 @@ class Player : public QObject {
   signals:
     void notify_bid_lord(Player* player, int points);
     
+    void notify_play_a_hand(Player* player, const Cards& cards);
+    
   protected:
     int score_;
     QString name_;
