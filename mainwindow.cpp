@@ -53,6 +53,7 @@ void MainWindow::game_control_init() {
     connect(game_control_, &GameControl::player_status_changed, this, &MainWindow::on_player_status_changed);
     connect(game_control_, &GameControl::notify_bid_lord, this, &MainWindow::on_bid_lord);
     connect(game_control_, &GameControl::game_status_changed, this, &MainWindow::game_status_process);
+    connect(game_control_, &GameControl::notify_play_a_hand, this, &MainWindow::on_play_a_hand);
 }
 
 void MainWindow::update_scores() {
@@ -315,6 +316,33 @@ void MainWindow::update_player_cards(Player* player) {
             int top = cards_rect.top() + (cards_rect.height() - (cards_list.size() - 1) * card_space - card_size_.height()) / 2;
             
             panel->move(left, top + card_space * i);
+        }
+    }
+    
+    QRect play_a_hand_rect = context_map_[player].play_a_hand_rect;
+    Cards last_cards = context_map_[player].last_cards;
+    card_space = 24;
+    
+    if (!last_cards.is_empty()) {
+        Card::CardList last_cards_list = last_cards.to_card_list();
+        for (int i = 0; i < last_cards_list.size(); ++i) {
+            CardPanel* panel = card_map_[last_cards_list[i]];
+            
+            panel->set_front_side(true);
+            panel->raise();
+            
+            if (context_map_[player].alignment == CardAlignment::kHorizontal) {
+                int left = play_a_hand_rect.left() + (play_a_hand_rect.width() - (last_cards_list.size() - 1) * card_space
+                                                      - panel->width()) / 2;
+                int top = play_a_hand_rect.top() + (play_a_hand_rect.height() - panel->height()) / 2;
+                
+                panel->move(left + i * card_space, top);
+            } else {
+                int left = play_a_hand_rect.left() + (play_a_hand_rect.width() - panel->width()) / 2;
+                int top = play_a_hand_rect.top();
+                
+                panel->move(left, top + i * card_space);
+            }
         }
     }
 }
