@@ -4,6 +4,7 @@
 #include <QRandomGenerator>
 
 #include "./ui_mainwindow.h"
+#include "playahand.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
@@ -383,6 +384,31 @@ void MainWindow::on_bid_lord(Player* player, int points, bool is_first_bidding) 
     show_animatiion(AnimationType::kBidPoints, points);
 }
 
+void MainWindow::on_play_a_hand(Player* player, Cards& cards) {    
+    auto it = context_map_.find(player);
+    it->last_cards = cards;
+    
+    hide_player_pending_cards(player);
+    
+    PlayAHand hand(cards);
+    PlayAHand::HandType hand_type = hand.hand_type();
+    
+    if (hand_type == PlayAHand::HandType::kHandPlane || hand_type == PlayAHand::HandType::kHandPlaneTwoSingle
+        || hand_type == PlayAHand::HandType::kHandPlaneTwoPair) {
+        show_animatiion(AnimationType::kPlane);
+    } else if (hand_type == PlayAHand::HandType::kHandSeqPair) {
+        show_animatiion(AnimationType::kSeqPair);
+    } else if (hand_type == PlayAHand::HandType::kHandSeqSingle) {
+        show_animatiion(AnimationType::kSeqSingle);
+    } else if (hand_type == PlayAHand::HandType::kHandBomb) {
+        show_animatiion(AnimationType::kBomb);
+    } else if (hand_type == PlayAHand::HandType::kHandBombJokers) {
+        show_animatiion(AnimationType::kJockerBomb);
+    }
+    
+    update_player_cards(player);
+}
+
 void MainWindow::show_animatiion(AnimationType type, int points) {
     switch(type) {
         case AnimationType::kSeqSingle:
@@ -403,6 +429,21 @@ void MainWindow::show_animatiion(AnimationType type, int points) {
     }
     
     animation_window_->show();
+}
+
+void MainWindow::hide_player_pending_cards(Player* player) {
+    auto it = context_map_.find(player);
+    if (it != context_map_.end()) {
+        if (it->last_cards.is_empty()) {
+            it->info->setPixmap(QPixmap(":/images/pass.png"));
+            it->info->show();
+        } else {
+            Card::CardList card_list = it->last_cards.to_card_list();
+            for (auto last_cards_it = card_list.begin(); last_cards_it != card_list.end(); ++last_cards_it) {
+                card_map_[*last_cards_it]->hide();
+            }
+        }
+    }
 }
 
 void MainWindow::paintEvent(QPaintEvent *event) {

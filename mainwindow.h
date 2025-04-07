@@ -63,7 +63,11 @@ class MainWindow : public QMainWindow {
     
     void on_bid_lord(Player* player, int points, bool is_first_bidding);
     
+    void on_play_a_hand(Player* player, Cards& cards);
+    
     void show_animatiion(AnimationType type, int points = 0);
+    
+    void hide_player_pending_cards(Player* player);
     
   protected:
     void paintEvent(QPaintEvent* event) override;
