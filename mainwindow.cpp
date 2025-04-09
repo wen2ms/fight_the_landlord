@@ -388,8 +388,28 @@ void MainWindow::on_player_status_changed(Player* player, GameControl::PlayerSta
             }
             break;
         case GameControl::PlayerStatus::kPreparePlayAHand:
+            hide_player_pending_cards(player);
+            
+            if (player == game_control_->user_player()) {
+                Player* pending_player = game_control_->pending_player();
+                if (pending_player == game_control_->user_player() || pending_player == nullptr) {
+                    ui->button_group->select_panel(ButtonGroup::Panel::KPlayACard);
+                } else {
+                    ui->button_group->select_panel(ButtonGroup::Panel::kPassOrPlay);
+                }
+            } else {
+                ui->button_group->select_panel(ButtonGroup::Panel::kEmpty);
+            }
             break;
         case GameControl::PlayerStatus::kWin:
+            context_map_[game_control_->left_robot()].is_front_side = true;
+            context_map_[game_control_->right_robot()].is_front_side = true;
+            
+            update_player_cards(game_control_->left_robot());
+            update_player_cards(game_control_->right_robot());
+            
+            update_scores();
+            game_control_->set_current_player(player);
             break;            
     }
 }
@@ -415,8 +435,6 @@ void MainWindow::on_bid_lord(Player* player, int points, bool is_first_bidding) 
 void MainWindow::on_play_a_hand(Player* player, Cards& cards) {    
     auto it = context_map_.find(player);
     it->last_cards = cards;
-    
-    hide_player_pending_cards(player);
     
     PlayAHand hand(cards);
     PlayAHand::HandType hand_type = hand.hand_type();
