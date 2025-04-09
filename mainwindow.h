@@ -39,7 +39,7 @@ class MainWindow : public QMainWindow {
     
     void init_cardmap();
     
-    void crop_image(QPixmap image, int x, int y, Card& card);
+    void crop_image(QPixmap& image, int x, int y, Card& card);
     
     void init_buttons_group();
     

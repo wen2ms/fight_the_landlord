@@ -189,7 +189,7 @@ void GameControl::on_bid_lord(Player *player, int points) {
     current_player_->prepare_bid_lord();
 }
 
-void GameControl::on_play_a_hand(Player *player, Cards &cards) {
+void GameControl::on_play_a_hand(Player *player, Cards cards) {
     emit notify_play_a_hand(player, cards);
     
     if (!cards.is_empty()) {

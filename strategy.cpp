@@ -1,6 +1,7 @@
 #include "strategy.h"
 
 #include <QMap>
+#include <QDebug>
 
 Strategy::Strategy(Player *player, const Cards &cards) {
     player_ = player;
@@ -63,7 +64,7 @@ Cards Strategy::first_play() {
                                                                                      false);
     if (!plane_list.empty()) {
         has_plane = true;
-        filtered_cards.remove(plane_list);           
+        filtered_cards.remove(plane_list);
     }
     
     QVector<Cards> triple_list = Strategy(player_, filtered_cards).find_cards_by_type(PlayAHand(PlayAHand::HandType::kHandTriple,
@@ -71,7 +72,7 @@ Cards Strategy::first_play() {
                                                                                      false);
     if (!triple_list.empty()) {
         has_triple = true;
-        filtered_cards.remove(triple_list);           
+        filtered_cards.remove(triple_list);
     }
     
     QVector<Cards> seq_pair_list = Strategy(player_, filtered_cards).find_cards_by_type(PlayAHand(PlayAHand::HandType::kHandSeqPair,
@@ -79,7 +80,7 @@ Cards Strategy::first_play() {
                                                                                      false);
     if (!seq_pair_list.empty()) {
         has_seq_pair = true;
-        filtered_cards.remove(seq_pair_list);           
+        filtered_cards.remove(seq_pair_list);
     }
     
     if (has_seq_pair) {
@@ -120,9 +121,9 @@ Cards Strategy::first_play() {
             
             for (int rank = Card::CardRank::kCard3; rank <= Card::CardRank::kCard10; ++rank) {
                 if (filtered_cards.rank_count((Card::CardRank)rank) == 1) {
-                    Cards two_single = Strategy(player_, filtered_cards).find_same_rank_cards((Card::CardRank)rank, 1);
-                    if (!two_single.is_empty()) {
-                        two_single_list << two_single;
+                    Cards single = Strategy(player_, filtered_cards).find_same_rank_cards((Card::CardRank)rank, 1);
+                    if (!single.is_empty()) {
+                        two_single_list << single;
                         
                         if (two_single_list.size() == 2) {
                             has_two_single = true;
@@ -582,11 +583,11 @@ QVector<Cards> Strategy::get_seq_pair_or_seq_single(SeqCardsInfo& info) {
     
     if (info.beat) {
         for (int rank = info.rank_begin; rank <= info.rank_end; ++rank) {            
-            if (rank + info.extra_info > Card::CardRank::kCard2) {
+            if (rank + info.extra_info >= Card::CardRank::kCard2) {
                 break;
             }
             
-            bool is_found = false;
+            bool is_found = true;
             Cards seq_cards;
             for (int i = 0; i < info.extra_info; ++i) {
                 Cards cards = find_same_rank_cards((Card::CardRank)(rank + i), info.search_number);
@@ -612,7 +613,7 @@ QVector<Cards> Strategy::get_seq_pair_or_seq_single(SeqCardsInfo& info) {
             if (base_seq_cards.is_empty()) {
                 continue;
             }
-            
+                
             find_cards_list << base_seq_cards;
             
             int followed_rank = rank + info.base_count;
@@ -644,7 +645,7 @@ Cards Strategy::get_base_seq_pair(Card::CardRank rank) {
     Cards base_cards2 = find_same_rank_cards((Card::CardRank)(rank + 2), 2);
     Cards base_seq;
     
-    if (!base_cards0.is_empty() && !base_cards1.is_empty() && !base_cards1.is_empty()) {
+    if (!base_cards0.is_empty() && !base_cards1.is_empty() && !base_cards2.is_empty()) {
         base_seq << base_cards0 << base_cards1 << base_cards2;
     }
     
@@ -659,7 +660,8 @@ Cards Strategy::get_base_seq_single(Card::CardRank rank) {
     Cards base_cards4 = find_same_rank_cards((Card::CardRank)(rank + 4), 1);
     Cards base_seq;
     
-    if (!base_cards0.is_empty() && !base_cards1.is_empty() && !base_cards1.is_empty()) {
+    if (!base_cards0.is_empty() && !base_cards1.is_empty() && !base_cards2.is_empty() && !base_cards3.is_empty()
+        && !base_cards4.is_empty()) {
         base_seq << base_cards0 << base_cards1 << base_cards2 << base_cards3 << base_cards4;
     }
     

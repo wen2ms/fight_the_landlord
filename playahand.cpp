@@ -47,6 +47,7 @@ void PlayAHand::classify(Cards &cards) {
 void PlayAHand::judge_card_type() {
     hand_type_ = HandType::kHandUnknown;
     card_rank_ = Card::CardRank::kRankBegin;
+    extra_info_ = 0;
     
     if (is_pass()) {
         hand_type_ = HandType::kHandPass;
@@ -133,7 +134,7 @@ bool PlayAHand::can_beat(const PlayAHand &other) {
     }
     
     if (hand_type_ == other.hand_type_) {
-        if (hand_type_ == HandType::kHandPair || hand_type_ == HandType::kHandSingle) {
+        if (hand_type_ == HandType::kHandSeqPair || hand_type_ == HandType::kHandSeqSingle) {
             return card_rank_ > other.card_rank_ && extra_info_ == other.extra_info_;
         } else {
             return card_rank_ > other.card_rank_;
@@ -221,8 +222,7 @@ bool PlayAHand::is_plane_two_pair() {
     if (one_card_.empty() && two_card_.size() == 2 && three_card_.size() == 2 && four_card_.empty()) {
         std::sort(three_card_.begin(), three_card_.end());
         
-        if (three_card_[1] - three_card_[0] == 1 && three_card_[1] < Card::CardRank::kCard2
-            && one_card_[0] != Card::CardRank::kCardSJ && one_card_[1] != Card::CardRank::kCardBJ) {
+        if (three_card_[1] - three_card_[0] == 1 && three_card_[1] < Card::CardRank::kCard2) {
             return true;   
         }
     }

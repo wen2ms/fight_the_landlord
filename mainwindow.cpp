@@ -84,7 +84,7 @@ void MainWindow::init_cardmap() {
     crop_image(cards_image, card_size_.width(), 4 * card_size_.height(), bj_card);
 }
 
-void MainWindow::crop_image(QPixmap image, int x, int y, Card& card) {
+void MainWindow::crop_image(QPixmap& image, int x, int y, Card& card) {
     QPixmap sub_image = image.copy(x, y, card_size_.width(), card_size_.height());
     
     CardPanel* card_panel = new CardPanel(this);
@@ -132,7 +132,7 @@ void MainWindow::init_player_context() {
     QPoint role_image_pos[] = {
         QPoint(cards_rect[0].left() - 80, cards_rect[0].height() / 2 + 20),
         QPoint(cards_rect[1].right() + 10, cards_rect[1].height() / 2 + 20),
-        QPoint(cards_rect[2].right() - 10, cards_rect[0].top() - 10)
+        QPoint(cards_rect[2].right() - 10, cards_rect[2].top() - 10)
     };
     
     int user_player_index = player_list_.indexOf(game_control_->user_player());
@@ -360,6 +360,8 @@ void MainWindow::update_player_cards(Player* player) {
                 
                 panel->move(left, top + i * card_space);
             }
+            
+            panel->show();
         }
     }
 }
@@ -442,11 +444,11 @@ void MainWindow::on_bid_lord(Player* player, int points, bool is_first_bidding) 
         } else {
             context.info->setPixmap(QPixmap(":/images/qiangdizhu.png"));
         }
+
+        show_animatiion(AnimationType::kBidPoints, points);
     }
     
     context.info->show();
-    
-    show_animatiion(AnimationType::kBidPoints, points);
 }
 
 void MainWindow::on_play_a_hand(Player* player, Cards& cards) {    
@@ -467,6 +469,11 @@ void MainWindow::on_play_a_hand(Player* player, Cards& cards) {
         show_animatiion(AnimationType::kBomb);
     } else if (hand_type == PlayAHand::HandType::kHandBombJokers) {
         show_animatiion(AnimationType::kJockerBomb);
+    }
+    
+    if (cards.is_empty()) {
+        it->info->setPixmap(QPixmap(":/images/pass.png"));
+        it->info->show();
     }
     
     update_player_cards(player);
@@ -498,8 +505,7 @@ void MainWindow::hide_player_pending_cards(Player* player) {
     auto it = context_map_.find(player);
     if (it != context_map_.end()) {
         if (it->last_cards.is_empty()) {
-            it->info->setPixmap(QPixmap(":/images/pass.png"));
-            it->info->show();
+            it->info->hide();
         } else {
             Card::CardList card_list = it->last_cards.to_card_list();
             for (auto last_cards_it = card_list.begin(); last_cards_it != card_list.end(); ++last_cards_it) {
