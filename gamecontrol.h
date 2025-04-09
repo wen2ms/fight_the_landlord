@@ -28,7 +28,7 @@ class GameControl : public QObject {
   public:
     enum GameStatus {
         kDealingCard,
-        kBiddingCard,
+        kBiddingLord,
         kPlayingAHand
     };
     

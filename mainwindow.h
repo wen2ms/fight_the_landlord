@@ -69,6 +69,8 @@ class MainWindow : public QMainWindow {
     
     void hide_player_pending_cards(Player* player);
     
+    QPixmap load_role_image(Player::Sex sex, Player::Direction direction, Player::Role role);
+    
   protected:
     void paintEvent(QPaintEvent* event) override;
     

@@ -201,7 +201,7 @@ void MainWindow::game_status_process(GameControl::GameStatus status) {
         case GameControl::GameStatus::kDealingCard:
             start_dealing_card();
             break;
-        case GameControl::GameStatus::kBiddingCard: {
+        case GameControl::GameStatus::kBiddingLord: {
             Card::CardList last_three_cards = game_control_->take_remaining_cards().to_card_list();
             
             for (int i = 0; i < last_three_cards.size(); ++i) {
@@ -215,6 +215,23 @@ void MainWindow::game_status_process(GameControl::GameStatus status) {
             break;
         }
         case GameControl::GameStatus::kPlayingAHand:
+            base_card_->hide();
+            moving_card_->hide();
+            
+            for (int i = 0; i < last_three_cards_.size(); ++i) {
+                last_three_cards_.at(i)->show();
+            }
+            
+            for (int i = 0; i < player_list_.size(); ++i) {
+                Player* player = player_list_.at(i);
+                PlayerContext& context = context_map_[player];
+                
+                context.info->hide();
+                
+                QPixmap pixmap = load_role_image(player->sex(), player->direction(), player->role());
+                context.role_image->setPixmap(pixmap);
+                context.role_image->show();
+            }
             break;
         default:
             break;
@@ -370,7 +387,7 @@ void MainWindow::on_deal_card() {
         if (game_control_->take_remaining_cards().cards_count() == 3) {
             timer_->stop();
             
-            game_status_process(GameControl::GameStatus::kBiddingCard);
+            game_status_process(GameControl::GameStatus::kBiddingLord);
             return;
         }
     }
@@ -490,6 +507,43 @@ void MainWindow::hide_player_pending_cards(Player* player) {
             }
         }
     }
+}
+
+QPixmap MainWindow::load_role_image(Player::Sex sex, Player::Direction direction, Player::Role role) {
+    QVector<QString> lord_male;
+    QVector<QString> lord_female;
+    QVector<QString> farmer_male;    
+    QVector<QString> farmer_female;
+    
+    lord_male << ":/images/lord_man_1.png" << ":/images/lord_man_2.png";
+    lord_female << ":/images/lord_woman_1.png" << ":/images/lord_woman_2.png";
+    farmer_male << ":/images/farmer_man_1.png" << ":/images/farmer_man_2.png";    
+    farmer_female << ":/images/farmer_woman_1.png" << ":/images/farmer_woman_2.png";
+    
+    QImage image;
+    int random = QRandomGenerator::global()->bounded(2);
+    if (sex == Player::Sex::kMale) {
+        if (role == Player::Role::kLord) {
+            image.load(lord_male.at(random));
+        } else {
+            image.load(farmer_male.at(random));
+        }
+    } else {
+        if (role == Player::Role::kLord) {
+            image.load(lord_female.at(random));
+        } else {
+            image.load(farmer_female.at(random));
+        }
+    }
+    
+    QPixmap pixmap;
+    if (direction == Player::Direction::kLeft) {
+        pixmap = QPixmap::fromImage(image);
+    } else {
+        pixmap = QPixmap::fromImage(image.mirrored(true, false));
+    }
+    
+    return pixmap;
 }
 
 void MainWindow::paintEvent(QPaintEvent *event) {
