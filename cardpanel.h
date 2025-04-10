@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QPixmap>
+#include <QMouseEvent>
 
 #include "card.h"
 #include "player.h"
@@ -27,12 +28,15 @@ class CardPanel : public QWidget {
     void set_owner(Player* player);
     Player* get_owner();
     
+    void clicked();
+    
   protected:
     void paintEvent(QPaintEvent* event) override;
     
     void mousePressEvent(QMouseEvent* event) override;
 
   signals:
+    void card_selected(Qt::MouseButton button);
     
   private:
     QPixmap front_;

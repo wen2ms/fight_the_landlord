@@ -66,6 +66,8 @@ class Player : public QObject {
     
     void notify_play_a_hand(Player* player, Cards cards);
     
+    void notify_got_cards(Player* player, Cards& cards);
+    
   protected:
     int score_;
     QString name_;

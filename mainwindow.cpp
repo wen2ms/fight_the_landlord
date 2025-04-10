@@ -54,6 +54,10 @@ void MainWindow::game_control_init() {
     connect(game_control_, &GameControl::notify_bid_lord, this, &MainWindow::on_bid_lord);
     connect(game_control_, &GameControl::game_status_changed, this, &MainWindow::game_status_process);
     connect(game_control_, &GameControl::notify_play_a_hand, this, &MainWindow::on_play_a_hand);
+    
+    connect(left_robot, &Player::notify_got_cards, this, &MainWindow::dealt_card_process);
+    connect(right_robot, &Player::notify_got_cards, this, &MainWindow::dealt_card_process);
+    connect(user_player, &Player::notify_got_cards, this, &MainWindow::dealt_card_process);    
 }
 
 void MainWindow::update_scores() {
@@ -94,6 +98,8 @@ void MainWindow::crop_image(QPixmap& image, int x, int y, Card& card) {
     card_panel->hide();
     
     card_map_.insert(card, card_panel);
+    
+    connect(card_panel, &CardPanel::card_selected, this, &MainWindow::on_card_selected);
 }
 
 void MainWindow::init_buttons_group() {
@@ -309,6 +315,9 @@ void MainWindow::update_player_cards(Player* player) {
     Cards cards = player->cards();
     Card::CardList cards_list = cards.to_card_list();
     
+    cards_rect_ = QRect();
+    user_cards_.clear();
+    
     int card_space = 20;
     QRect cards_rect = context_map_[player].cards_rect;
     
@@ -328,6 +337,18 @@ void MainWindow::update_player_cards(Player* player) {
             }
             
             panel->move(left + card_space * i, top);
+            
+            cards_rect_ = QRect(left, top, card_space * i + card_size_.width(), card_size_.height());
+            
+            int current_panel_width = 0;
+            if (i == cards_list.size() - 1) {
+                current_panel_width = card_size_.width();
+            } else {
+                current_panel_width = card_space;
+            }
+            
+            QRect card_panel_rect(left + card_space * i, top, current_panel_width, card_size_.height());
+            user_cards_.insert(panel, card_panel_rect);            
         } else {
             int left = cards_rect.left() + (cards_rect.width() - card_size_.width()) / 2;
             int top = cards_rect.top() + (cards_rect.height() - (cards_list.size() - 1) * card_space - card_size_.height()) / 2;
@@ -375,10 +396,6 @@ void MainWindow::on_deal_card() {
         Card card = game_control_->take_one_card();
         
         current_player->store_dealt_card(card);
-                
-        Cards cards(card);
-        
-        dealt_card_process(current_player, cards);
         
         game_control_->set_current_player(current_player->next_player());
         
@@ -479,6 +496,34 @@ void MainWindow::on_play_a_hand(Player* player, Cards& cards) {
     update_player_cards(player);
 }
 
+void MainWindow::on_card_selected(Qt::MouseButton button) {
+    if (game_status_ != GameControl::GameStatus::kPlayingAHand) {
+        return;
+    }
+    
+    CardPanel* card_panel = (CardPanel*)sender();
+    if (card_panel->get_owner() != game_control_->user_player()) {
+        return;
+    }
+    
+    current_selected_panel_ = card_panel;
+    if (button == Qt::LeftButton) {
+        card_panel->set_selected_side(!card_panel->is_selected());
+        
+        update_player_cards(card_panel->get_owner());
+        
+        QSet<CardPanel*>::ConstIterator it = selected_cards_.find(card_panel);
+        if (it == selected_cards_.constEnd()) {
+            selected_cards_.insert(card_panel);
+        } else {
+            selected_cards_.erase(it);
+        }
+        
+    } else if (button == Qt::RightButton) {
+        
+    }
+}
+
 void MainWindow::show_animatiion(AnimationType type, int points) {
     switch(type) {
         case AnimationType::kSeqSingle:
@@ -556,4 +601,25 @@ void MainWindow::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     
     painter.drawPixmap(rect(), background_image_);
+}
+
+void MainWindow::mouseMoveEvent(QMouseEvent* event) {
+    if (event->buttons() & Qt::LeftButton) {
+        QPoint point = event->pos();
+        
+        if (!cards_rect_.contains(point)) {
+            current_selected_panel_ = nullptr;
+        } else {
+            QList<CardPanel*> panel_list = user_cards_.keys();
+            
+            for (int i = 0; i < panel_list.size(); ++i) {
+                CardPanel* panel = panel_list.at(i);
+                if (user_cards_[panel].contains(point) && current_selected_panel_ != panel) {
+                    panel->clicked();
+                    
+                    current_selected_panel_ = panel;
+                }
+            }
+        }
+    }
 }

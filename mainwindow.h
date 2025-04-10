@@ -65,6 +65,8 @@ class MainWindow : public QMainWindow {
     
     void on_play_a_hand(Player* player, Cards& cards);
     
+    void on_card_selected(Qt::MouseButton button);
+    
     void show_animatiion(AnimationType type, int points = 0);
     
     void hide_player_pending_cards(Player* player);
@@ -73,6 +75,8 @@ class MainWindow : public QMainWindow {
     
   protected:
     void paintEvent(QPaintEvent* event) override;
+    
+    void mouseMoveEvent(QMouseEvent* event) override;
     
   private:
     enum CardAlignment {kHorizontal, kVertical};
@@ -112,5 +116,13 @@ class MainWindow : public QMainWindow {
     QTimer* timer_;
     
     AnimationWindow* animation_window_;
+    
+    CardPanel* current_selected_panel_;
+    
+    QSet<CardPanel*> selected_cards_;
+    
+    QRect cards_rect_;
+    QHash<CardPanel*, QRect> user_cards_;
+    
 };
 #endif  // MAINWINDOW_H

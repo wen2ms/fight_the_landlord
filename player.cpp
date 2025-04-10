@@ -87,10 +87,16 @@ void Player::bid_lord(int points) {
 
 void Player::store_dealt_card(Card& card) {
     cards_.add(card);
+    
+    Cards cards(card);
+    
+    emit notify_got_cards(this, cards);
 }
 
 void Player::store_dealt_card(Cards& cards) {
     cards_.add(cards);
+    
+    emit notify_got_cards(this, cards);
 }
 
 Cards Player::cards() {
