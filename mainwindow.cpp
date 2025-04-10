@@ -618,6 +618,7 @@ void MainWindow::hide_player_pending_cards(Player* player) {
                 card_map_[*last_cards_it]->hide();
             }
         }
+        it->last_cards.clear();
     }
 }
 
