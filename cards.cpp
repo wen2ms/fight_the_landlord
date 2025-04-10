@@ -81,7 +81,7 @@ Card::CardRank Cards::min_rank() {
 int Cards::rank_count(Card::CardRank rank) {
     int count = 0;
     for (auto it = cards_.begin(); it != cards_.end(); ++it) {
-        if (it->rank() > rank) {
+        if (it->rank() == rank) {
             count++;
         }
     }

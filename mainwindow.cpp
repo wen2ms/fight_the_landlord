@@ -115,7 +115,7 @@ void MainWindow::init_buttons_group() {
         game_status_process(GameControl::GameStatus::kDealingCard);
     });
     connect(ui->button_group, &ButtonGroup::play_a_hand, this, &MainWindow::on_user_play_a_hand);
-    connect(ui->button_group, &ButtonGroup::pass, this, [=]() {});
+    connect(ui->button_group, &ButtonGroup::pass, this, &MainWindow::on_user_pass);
     connect(ui->button_group, &ButtonGroup::bid_points, this, [=](int points) {
         game_control_->user_player()->bid_lord(points);
         ui->button_group->select_panel(ButtonGroup::Panel::kEmpty);
@@ -543,7 +543,7 @@ void MainWindow::on_user_play_a_hand() {
         cards.add(card);
     }
     
-    PlayAHand hand;
+    PlayAHand hand(cards);
     PlayAHand::HandType hand_type = hand.hand_type();
     if (hand_type == PlayAHand::HandType::kHandUnknown) {
         return;
@@ -559,6 +559,30 @@ void MainWindow::on_user_play_a_hand() {
     game_control_->user_player()->play_a_hand(cards);
     
     selected_cards_.clear();
+}
+
+void MainWindow::on_user_pass() {
+    Player* user_player = game_control_->user_player();
+    Player* current_player = game_control_->current_player();
+    
+    if (current_player != user_player) {
+        return;
+    }
+    
+    Player* pending_player = game_control_->pending_player();
+    if (pending_player == user_player || pending_player == nullptr) {
+        return;
+    }
+    
+    Cards empty_cards;
+    user_player->play_a_hand(empty_cards);
+    
+    for (auto it = selected_cards_.begin(); it != selected_cards_.end(); ++it) {
+        (*it)->set_selected_side(false);
+    }
+    selected_cards_.clear();
+    
+    update_player_cards(user_player);
 }
 
 void MainWindow::show_animatiion(AnimationType type, int points) {

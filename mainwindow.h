@@ -69,6 +69,8 @@ class MainWindow : public QMainWindow {
     
     void on_user_play_a_hand();
     
+    void on_user_pass();
+    
     void show_animatiion(AnimationType type, int points = 0);
     
     void hide_player_pending_cards(Player* player);
