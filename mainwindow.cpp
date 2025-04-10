@@ -114,7 +114,7 @@ void MainWindow::init_buttons_group() {
         
         game_status_process(GameControl::GameStatus::kDealingCard);
     });
-    connect(ui->button_group, &ButtonGroup::play_a_hand, this, [=]() {});
+    connect(ui->button_group, &ButtonGroup::play_a_hand, this, &MainWindow::on_user_play_a_hand);
     connect(ui->button_group, &ButtonGroup::pass, this, [=]() {});
     connect(ui->button_group, &ButtonGroup::bid_points, this, [=](int points) {
         game_control_->user_player()->bid_lord(points);
@@ -520,8 +520,45 @@ void MainWindow::on_card_selected(Qt::MouseButton button) {
         }
         
     } else if (button == Qt::RightButton) {
-        
+        on_user_play_a_hand();
     }
+}
+
+void MainWindow::on_user_play_a_hand() {
+    if (game_status_ != GameControl::GameStatus::kPlayingAHand) {
+        return;
+    }
+    
+    if (game_control_->current_player() != game_control_->user_player()) {
+        return;
+    }
+    
+    if (selected_cards_.empty()) {
+        return;
+    }
+    
+    Cards cards;
+    for (auto it = selected_cards_.begin(); it != selected_cards_.end(); ++it) {
+        Card card = (*it)->get_card();
+        cards.add(card);
+    }
+    
+    PlayAHand hand;
+    PlayAHand::HandType hand_type = hand.hand_type();
+    if (hand_type == PlayAHand::HandType::kHandUnknown) {
+        return;
+    }
+    
+    if (game_control_->pending_player() != game_control_->user_player()) {
+        Cards pending_cards = game_control_->pending_cards();
+        if (!hand.can_beat(PlayAHand(pending_cards))) {
+            return;
+        }
+    }
+    
+    game_control_->user_player()->play_a_hand(cards);
+    
+    selected_cards_.clear();
 }
 
 void MainWindow::show_animatiion(AnimationType type, int points) {

@@ -67,6 +67,8 @@ class MainWindow : public QMainWindow {
     
     void on_card_selected(Qt::MouseButton button);
     
+    void on_user_play_a_hand();
+    
     void show_animatiion(AnimationType type, int points = 0);
     
     void hide_player_pending_cards(Player* player);
