@@ -21,7 +21,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="my_title">
      <property name="font">
       <font>
        <family>AppleGothic</family>
@@ -55,7 +55,7 @@
     </widget>
    </item>
    <item row="0" column="2">
-    <widget class="QLabel" name="label_3">
+    <widget class="QLabel" name="points1">
      <property name="font">
       <font>
        <family>AppleGothic</family>
@@ -72,7 +72,7 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QLabel" name="label_4">
+    <widget class="QLabel" name="left_title">
      <property name="font">
       <font>
        <family>AppleGothic</family>
@@ -106,7 +106,7 @@
     </widget>
    </item>
    <item row="1" column="2">
-    <widget class="QLabel" name="label_8">
+    <widget class="QLabel" name="points2">
      <property name="font">
       <font>
        <family>AppleGothic</family>
@@ -123,7 +123,7 @@
     </widget>
    </item>
    <item row="2" column="0">
-    <widget class="QLabel" name="label_5">
+    <widget class="QLabel" name="right_title">
      <property name="font">
       <font>
        <family>AppleGothic</family>
@@ -157,7 +157,7 @@
     </widget>
    </item>
    <item row="2" column="2">
-    <widget class="QLabel" name="label_9">
+    <widget class="QLabel" name="points3">
      <property name="font">
       <font>
        <family>AppleGothic</family>
