@@ -6,4 +6,6 @@ UserPlayer::UserPlayer(QObject *parent) : Player{parent} {
 
 void UserPlayer::prepare_bid_lord() {}
 
-void UserPlayer::prepare_play_a_hand() {}
+void UserPlayer::prepare_play_a_hand() {
+    emit start_count_down();
+}

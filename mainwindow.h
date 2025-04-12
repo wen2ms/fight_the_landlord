@@ -10,6 +10,7 @@
 #include "gamecontrol.h"
 #include "cardpanel.h"
 #include "animationwindow.h"
+#include "countdown.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -79,6 +80,8 @@ class MainWindow : public QMainWindow {
     
     void show_end_panel();
     
+    void init_count_down();
+    
   protected:
     void paintEvent(QPaintEvent* event) override;
     
@@ -130,5 +133,6 @@ class MainWindow : public QMainWindow {
     QRect cards_rect_;
     QHash<CardPanel*, QRect> user_cards_;
     
+    CountDown* count_down_;
 };
 #endif  // MAINWINDOW_H

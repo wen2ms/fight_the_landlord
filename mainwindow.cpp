@@ -30,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     
     init_game_scene();
     
+    init_count_down();
+    
     timer_ = new QTimer(this);
     
     connect(timer_, &QTimer::timeout, this, &MainWindow::on_deal_card);
@@ -598,12 +600,16 @@ void MainWindow::on_user_play_a_hand() {
         }
     }
     
+    count_down_->stop_count_down();
+    
     game_control_->user_player()->play_a_hand(cards);
     
     selected_cards_.clear();
 }
 
 void MainWindow::on_user_pass() {
+    count_down_->stop_count_down();
+    
     Player* user_player = game_control_->user_player();
     Player* current_player = game_control_->current_player();
     
@@ -688,6 +694,23 @@ void MainWindow::show_end_panel() {
         
         ui->button_group->select_panel(ButtonGroup::Panel::kEmpty);
         game_status_process(GameControl::GameStatus::kDealingCard);
+    });
+}
+
+void MainWindow::init_count_down() {
+    count_down_ = new CountDown(this);
+    count_down_->move((width() - count_down_->width()) / 2, (height() - count_down_->height()) / 2 + 30);
+    
+    connect(count_down_, &CountDown::not_enough_time, this, [=]() {
+        
+    });
+    connect(count_down_, &CountDown::timeout, this, &MainWindow::on_user_pass);
+    
+    UserPlayer* user_player = game_control_->user_player();
+    connect(user_player, &UserPlayer::start_count_down, this, [=]() {
+        if (game_control_->pending_player() != user_player && game_control_->pending_player() != nullptr) {
+            count_down_->show_count_down();
+        }
     });
 }
 

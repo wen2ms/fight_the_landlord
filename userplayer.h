@@ -14,6 +14,9 @@ class UserPlayer : public Player {
     
     void prepare_bid_lord() override;
     void prepare_play_a_hand() override;
+    
+  signals:
+    void start_count_down();
 };
 
 #endif  // USERPLAYER_H

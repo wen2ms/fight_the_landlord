@@ -8,13 +8,13 @@ CountDown::CountDown(QWidget *parent) : QWidget{parent} {
     timer_ = new QTimer(this);
     connect(timer_, &QTimer::timeout, this, [=]() {
         count_--;
-        if (count_ < 10 && count_ >= 0) {
+        if (count_ < 10 && count_ > 0) {
             clock_.load(":/images/clock.png");
             number_ = QPixmap(":/images/number.png").copy(count_ * (30 + 10), 0, 30, 42).scaled(20, 30);
             if (count_ == 5) {
                 emit not_enough_time();
             }
-        } else if (count_ < 0) {
+        } else if (count_ <= 0) {
             clock_ = QPixmap();
             number_ = QPixmap();
             timer_->stop();
