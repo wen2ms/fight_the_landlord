@@ -15,7 +15,7 @@ class AnimationWindow : public QWidget {
     
     void show_sequence(SeqType type);
     
-    void show_jocker_bomb();
+    void show_joker_bomb();
     
     void show_bomb();
     

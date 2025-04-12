@@ -38,7 +38,7 @@ void AnimationWindow::show_sequence(SeqType type) {
     QTimer::singleShot(2000, this, &AnimationWindow::hide);
 }
 
-void AnimationWindow::show_jocker_bomb() {
+void AnimationWindow::show_joker_bomb() {
     frame_index_ = 0;
     x_ = 0;
     
@@ -51,7 +51,7 @@ void AnimationWindow::show_jocker_bomb() {
             frame_index_ = 8;
             hide();
         }
-        QString name = QString(":/images/jocker_bomb_%1.png").arg(frame_index_);
+        QString name = QString(":/images/joker_bomb_%1.png").arg(frame_index_);
         image_.load(name);
         update();
     });

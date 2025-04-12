@@ -26,7 +26,7 @@ class MainWindow : public QMainWindow {
         kSeqSingle,
         kSeqPair,
         kPlane,
-        kJockerBomb,
+        kJokerBomb,
         kBomb,
         kBidPoints
     };

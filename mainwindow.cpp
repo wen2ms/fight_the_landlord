@@ -529,7 +529,7 @@ void MainWindow::on_play_a_hand(Player* player, Cards& cards) {
     } else if (hand_type == PlayAHand::HandType::kHandBomb) {
         show_animatiion(AnimationType::kBomb);
     } else if (hand_type == PlayAHand::HandType::kHandBombJokers) {
-        show_animatiion(AnimationType::kJockerBomb);
+        show_animatiion(AnimationType::kJokerBomb);
     }
     
     if (cards.is_empty()) {
@@ -636,14 +636,25 @@ void MainWindow::on_user_pass() {
 void MainWindow::show_animatiion(AnimationType type, int points) {
     switch(type) {
         case AnimationType::kSeqSingle:
-            break;
         case AnimationType::kSeqPair:
+            animation_window_->setFixedSize(250, 150);
+            animation_window_->move((width() - animation_window_->width()) / 2, 200);
+            animation_window_->show_sequence((AnimationWindow::SeqType)type);
             break;
         case AnimationType::kPlane:
+            animation_window_->setFixedSize(700, 75);
+            animation_window_->move((width() - animation_window_->width()) / 2, 200);
+            animation_window_->show_plane();
             break;
-        case AnimationType::kJockerBomb:
+        case AnimationType::kJokerBomb:
+            animation_window_->setFixedSize(250, 200);
+            animation_window_->move((width() - animation_window_->width()) / 2, (height() - animation_window_->height()) / 2 - 70);
+            animation_window_->show_joker_bomb();
             break;
         case AnimationType::kBomb:
+            animation_window_->setFixedSize(180, 200);
+            animation_window_->move((width() - animation_window_->width()) / 2, (height() - animation_window_->height()) / 2 - 70);
+            animation_window_->show_bomb();
             break;
         case AnimationType::kBidPoints:
             animation_window_->setFixedSize(160, 98);
