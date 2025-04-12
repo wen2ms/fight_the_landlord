@@ -1,9 +1,11 @@
 #include "mainwindow.h"
 
 #include <QPainter>
+#include <QPropertyAnimation>
 #include <QRandomGenerator>
 
 #include "./ui_mainwindow.h"
+#include "endpanel.h"
 #include "playahand.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -387,6 +389,43 @@ void MainWindow::update_player_cards(Player* player) {
     }
 }
 
+QPixmap MainWindow::load_role_image(Player::Sex sex, Player::Direction direction, Player::Role role) {
+    QVector<QString> lord_male;
+    QVector<QString> lord_female;
+    QVector<QString> farmer_male;    
+    QVector<QString> farmer_female;
+    
+    lord_male << ":/images/lord_man_1.png" << ":/images/lord_man_2.png";
+    lord_female << ":/images/lord_woman_1.png" << ":/images/lord_woman_2.png";
+    farmer_male << ":/images/farmer_man_1.png" << ":/images/farmer_man_2.png";    
+    farmer_female << ":/images/farmer_woman_1.png" << ":/images/farmer_woman_2.png";
+    
+    QImage image;
+    int random = QRandomGenerator::global()->bounded(2);
+    if (sex == Player::Sex::kMale) {
+        if (role == Player::Role::kLord) {
+            image.load(lord_male.at(random));
+        } else {
+            image.load(farmer_male.at(random));
+        }
+    } else {
+        if (role == Player::Role::kLord) {
+            image.load(lord_female.at(random));
+        } else {
+            image.load(farmer_female.at(random));
+        }
+    }
+    
+    QPixmap pixmap;
+    if (direction == Player::Direction::kLeft) {
+        pixmap = QPixmap::fromImage(image);
+    } else {
+        pixmap = QPixmap::fromImage(image.mirrored(true, false));
+    }
+    
+    return pixmap;
+}
+
 void MainWindow::on_deal_card() {
     static int current_card_pos = 0;
     
@@ -446,6 +485,9 @@ void MainWindow::on_player_status_changed(Player* player, GameControl::PlayerSta
             
             update_scores();
             game_control_->set_current_player(player);
+            show_end_panel();
+            break;
+        default:
             break;            
     }
 }
@@ -622,41 +664,31 @@ void MainWindow::hide_player_pending_cards(Player* player) {
     }
 }
 
-QPixmap MainWindow::load_role_image(Player::Sex sex, Player::Direction direction, Player::Role role) {
-    QVector<QString> lord_male;
-    QVector<QString> lord_female;
-    QVector<QString> farmer_male;    
-    QVector<QString> farmer_female;
+void MainWindow::show_end_panel() {
+    bool is_lord = game_control_->user_player()->role() == Player::Role::kLord;
+    bool is_win = game_control_->user_player()->is_win();
+    EndPanel* end_panel = new EndPanel(is_lord, is_win, this);
     
-    lord_male << ":/images/lord_man_1.png" << ":/images/lord_man_2.png";
-    lord_female << ":/images/lord_woman_1.png" << ":/images/lord_woman_2.png";
-    farmer_male << ":/images/farmer_man_1.png" << ":/images/farmer_man_2.png";    
-    farmer_female << ":/images/farmer_woman_1.png" << ":/images/farmer_woman_2.png";
+    end_panel->show();
+    end_panel->move((width() - end_panel->width()) / 2, -end_panel->height());
+    end_panel->set_scores(player_list_[0]->score(), player_list_[1]->score(), player_list_[2]->score());
     
-    QImage image;
-    int random = QRandomGenerator::global()->bounded(2);
-    if (sex == Player::Sex::kMale) {
-        if (role == Player::Role::kLord) {
-            image.load(lord_male.at(random));
-        } else {
-            image.load(farmer_male.at(random));
-        }
-    } else {
-        if (role == Player::Role::kLord) {
-            image.load(lord_female.at(random));
-        } else {
-            image.load(farmer_female.at(random));
-        }
-    }
+    QPropertyAnimation* animation = new QPropertyAnimation(end_panel, "geometry", this);
+    animation->setDuration(1500);
+    animation->setStartValue(QRect(end_panel->x(), end_panel->y(), end_panel->width(), end_panel->height()));
+    animation->setEndValue(QRect((width() - end_panel->width()) / 2, (height() - end_panel->height()) / 2,
+                                 end_panel->width(), end_panel->height()));
+    animation->setEasingCurve(QEasingCurve(QEasingCurve::OutBounce));
+    animation->start();
     
-    QPixmap pixmap;
-    if (direction == Player::Direction::kLeft) {
-        pixmap = QPixmap::fromImage(image);
-    } else {
-        pixmap = QPixmap::fromImage(image.mirrored(true, false));
-    }
-    
-    return pixmap;
+    connect(end_panel, &EndPanel::continue_game, this, [=]() {
+        end_panel->close();
+        end_panel->deleteLater();
+        animation->deleteLater();
+        
+        ui->button_group->select_panel(ButtonGroup::Panel::kEmpty);
+        game_status_process(GameControl::GameStatus::kDealingCard);
+    });
 }
 
 void MainWindow::paintEvent(QPaintEvent *event) {

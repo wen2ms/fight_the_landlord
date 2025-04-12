@@ -57,6 +57,8 @@ class MainWindow : public QMainWindow {
     
     void update_player_cards(Player* player);
     
+    QPixmap load_role_image(Player::Sex sex, Player::Direction direction, Player::Role role);
+    
     void on_deal_card();
     
     void on_player_status_changed(Player* player, GameControl::PlayerStatus status);
@@ -75,7 +77,7 @@ class MainWindow : public QMainWindow {
     
     void hide_player_pending_cards(Player* player);
     
-    QPixmap load_role_image(Player::Sex sex, Player::Direction direction, Player::Role role);
+    void show_end_panel();
     
   protected:
     void paintEvent(QPaintEvent* event) override;
