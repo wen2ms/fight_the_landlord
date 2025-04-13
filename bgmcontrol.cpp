@@ -12,24 +12,32 @@ BGMControl::BGMControl(QObject *parent) : QObject{parent} {
     init_play_list();
     
     for (int i = 0; i < 5; ++i) {
+        PlayerWrapper* wrapper = new PlayerWrapper;
         QMediaPlayer* player = new QMediaPlayer(this);
         QAudioOutput* audio_output = new QAudioOutput(this);
-        media_current_index_[i] = 0;
+        
+        if (i < 2 || i == 4) {
+            wrapper->mode = PlayerWrapper::PlayMode::kOnce;
+        }
         
         if (i == 2) {
-            connect(player, &QMediaPlayer::mediaStatusChanged, this, [=] (QMediaPlayer::MediaStatus status) {
-                media_current_index_[i] = (media_current_index_[i] + 1) % play_list_[i].size();
-                player->setSource(play_list_[i][media_current_index_[i]]);
-                player->play();
+            wrapper->mode = PlayerWrapper::PlayMode::kLoop;
+            
+            connect(player, &QMediaPlayer::mediaStatusChanged, this, [=](QMediaPlayer::MediaStatus status) {
+                if (status == QMediaPlayer::MediaStatus::EndOfMedia) {
+                    wrapper->set_index((wrapper->current_index + 1) % wrapper->play_list.size());
+                    wrapper->play(); 
+                }
             });
         }
         
         audio_output->setVolume(1);
         player->setAudioOutput(audio_output);
-        player->setSource(play_list_[i][media_current_index_[i]]);
         
-        media_player_.push_back(player);
-        audio_output_.push_back(audio_output);
+        wrapper->player = player;
+        wrapper->audio_output = audio_output;
+        
+        wrappers_list_.push_back(wrapper);
     }
 }
 
@@ -50,45 +58,42 @@ void BGMControl::init_play_list() {
         QString key = list.at(i);
         QJsonArray array = obj.value(key).toArray();
         for (int j = 0; j < array.size(); ++j) {
-            play_list_[i].push_back(QUrl(array.at(j).toString()));
+            wrappers_list_[i]->play_list.push_back(QUrl(array.at(j).toString()));
         }
     }
 }
 
 void BGMControl::start_bgm(int volume) {
-    media_current_index_[2] = 0;
-    audio_output_[2]->setVolume(volume);
-    media_player_[2]->setSource(play_list_[2][media_current_index_[2]]);
-    media_player_[2]->play();
+    wrappers_list_[2]->set_index(0);
+    wrappers_list_[2]->audio_output->setVolume(volume);
+    wrappers_list_[2]->play();
 }
 
 void BGMControl::stop_bgm() {
-    media_player_[2]->stop();
+    wrappers_list_[2]->stop();
 }
 
 void BGMControl::player_bidding_music(int points, PlayerSex sex, bool is_first) {
     int index = (sex == PlayerSex::kMale ? 0 : 1);
     if (is_first && points > 0) {
-        media_current_index_[index] = CardType::kOrder;
+        wrappers_list_[index]->set_index(CardType::kOrder);
     } else if (points == 0) {
         if (is_first) {
-            media_current_index_[index] = CardType::kNoOrder;
+            wrappers_list_[index]->set_index(CardType::kNoOrder);
         } else {
-            media_current_index_[index] = CardType::kNoRob;
+            wrappers_list_[index]->set_index(CardType::kNoRob);
         }
     } else if (points == 2) {
-        media_current_index_[index] = CardType::kRob1;
+        wrappers_list_[index]->set_index(CardType::kRob1);
     } else if (points == 3) {
-        media_current_index_[index] = CardType::kRob2;
+        wrappers_list_[index]->set_index(CardType::kRob2);
     }
     
-    media_player_[index]->setSource(play_list_[index][media_current_index_[index]]);
-    media_player_[index]->play();
+    wrappers_list_[index]->play();
 }
 
 void BGMControl::play_card_music(Cards& cards, PlayerSex sex, bool is_first) {
     int index = (sex == PlayerSex::kMale ? 0 : 1);
-    int& current_index = media_current_index_[index];
     
     Card::CardRank rank = Card::CardRank::kRankBegin;
     PlayAHand hand(cards);
@@ -146,11 +151,54 @@ void BGMControl::play_card_music(Cards& cards, PlayerSex sex, bool is_first) {
     }
     
     if (!is_first && (type_index >= CardType::kPlane && type_index < CardType::kFourBindTwo)) {
-        current_index = CardType::kMoreBiger1 + QRandomGenerator::global()->bounded(2);
+        wrappers_list_[index]->set_index(CardType::kMoreBiger1 + QRandomGenerator::global()->bounded(2));
     } else {
-        current_index = type_index;
+        wrappers_list_[index]->set_index(type_index);
     }
     
-    media_player_[index]->setSource(play_list_[index][media_current_index_[index]]);
-    media_player_[index]->play();
+    wrappers_list_[index]->play();
+}
+
+void BGMControl::play_pass_music(PlayerSex sex) {
+    int index = (sex == PlayerSex::kMale ? 0 : 1);
+    int random = QRandomGenerator::global()->bounded(4);
+    
+    wrappers_list_[index]->set_index(CardType::kPass1 + random);
+    wrappers_list_[index]->play();
+}
+
+void BGMControl::play_auxiliary_music(AuxiliaryMusic type) {
+    PlayerWrapper* wrapper = wrappers_list_[3];
+    
+    if (type == AuxiliaryMusic::kDealingCard) {
+        wrapper->mode = PlayerWrapper::PlayMode::kLoop;
+        if (wrapper->mode != PlayerWrapper::PlayMode::kLoop) {
+            connect(wrapper->player, &QMediaPlayer::mediaStatusChanged, this, [=](QMediaPlayer::MediaStatus status) {
+                if (status == QMediaPlayer::MediaStatus::EndOfMedia) {
+                    wrapper->set_index((wrapper->current_index + 1) % wrapper->play_list.size());
+                    wrapper->play(); 
+                }
+            });
+        }
+    } else {
+        wrapper->mode = PlayerWrapper::PlayMode::kOnce;
+        connect(wrapper->player, &QMediaPlayer::mediaStatusChanged, this, [](QMediaPlayer::MediaStatus status) {});
+    }
+    
+    wrapper->set_index(type);
+    wrapper->play();   
+}
+
+void BGMControl::stop_auxiliary_music() {
+    wrappers_list_[3]->stop();
+}
+
+void BGMControl::play_ending_music(bool is_win) {
+    if (is_win) {
+        wrappers_list_[4]->set_index(0);
+    } else {
+        wrappers_list_[4]->set_index(1);
+    }
+    
+    wrappers_list_[4]->play();
 }

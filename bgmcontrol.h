@@ -83,9 +83,44 @@ class BGMControl : public QObject {
         kLast1, 
         kLast2
     };
+    
+    enum AuxiliaryMusic {
+        kDealingCard,
+        kSelectCard,
+        kPlaneBackground,
+        kPBombBackground,
+        kAlert
+    };
+    
+    struct PlayerWrapper {
+        enum PlayMode {kOnce, kLoop};
+        
+        void play() {
+            if (play_list.empty()) {
+                return;
+            }
+            
+            player->setSource(play_list[current_index]);
+            player->play();
+        }
+        
+        void stop() {
+            player->stop();
+        }
+        
+        void set_index(int index) {
+            current_index = index;
+        }
+        
+        QMediaPlayer* player;
+        QAudioOutput* audio_output;
+        QVector<QUrl> play_list;
+        int current_index = 0;
+        PlayMode mode;
+    };
         
     explicit BGMControl(QObject *parent = nullptr);
-    
+        
     void init_play_list();
     
     void start_bgm(int volume);
@@ -95,14 +130,19 @@ class BGMControl : public QObject {
     void player_bidding_music(int points, PlayerSex sex, bool is_first);
     
     void play_card_music(Cards& cards, PlayerSex sex, bool is_first);
+    
+    void play_pass_music(PlayerSex sex);
+    
+    void play_auxiliary_music(AuxiliaryMusic type);
+    
+    void stop_auxiliary_music();
+    
+    void play_ending_music(bool is_win);
 
   signals:
     
   private:
-    QVector<QMediaPlayer*> media_player_;
-    QVector<QAudioOutput*> audio_output_;
-    QVector<QVector<QUrl>> play_list_;
-    QVector<int> media_current_index_;    
+    QVector<PlayerWrapper*> wrappers_list_;  
 };
 
 #endif  // BGMCONTROL_H
