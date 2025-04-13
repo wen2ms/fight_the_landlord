@@ -1,9 +1,11 @@
 #ifndef BGMCONTROL_H
 #define BGMCONTROL_H
 
-#include <QObject>
-#include <QMediaPlayer>
 #include <QAudioOutput>
+#include <QMediaPlayer>
+#include <QObject>
+
+#include "cards.h"
 
 class BGMControl : public QObject {
     Q_OBJECT
@@ -91,6 +93,8 @@ class BGMControl : public QObject {
     void stop_bgm();
     
     void player_bidding_music(int points, PlayerSex sex, bool is_first);
+    
+    void play_card_music(Cards& cards, PlayerSex sex, bool is_first);
 
   signals:
     

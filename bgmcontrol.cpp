@@ -4,6 +4,9 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QRandomGenerator>
+
+#include "playahand.h"
 
 BGMControl::BGMControl(QObject *parent) : QObject{parent} {
     init_play_list();
@@ -77,6 +80,75 @@ void BGMControl::player_bidding_music(int points, PlayerSex sex, bool is_first) 
         media_current_index_[index] = CardType::kRob1;
     } else if (points == 3) {
         media_current_index_[index] = CardType::kRob2;
+    }
+    
+    media_player_[index]->setSource(play_list_[index][media_current_index_[index]]);
+    media_player_[index]->play();
+}
+
+void BGMControl::play_card_music(Cards& cards, PlayerSex sex, bool is_first) {
+    int index = (sex == PlayerSex::kMale ? 0 : 1);
+    int& current_index = media_current_index_[index];
+    
+    Card::CardRank rank = Card::CardRank::kRankBegin;
+    PlayAHand hand(cards);
+    PlayAHand::HandType hand_type = hand.hand_type();
+    
+    if (hand_type == PlayAHand::HandType::kHandSingle || hand_type == PlayAHand::HandType::kHandPair
+        || hand_type == PlayAHand::HandType::kHandTriple) {
+        rank = cards.take_random_card().rank();
+    }
+    
+    int type_index = 0;
+    switch(hand_type) {
+        case PlayAHand::HandType::kHandSingle:
+            type_index = rank - 1;
+            break;
+        case PlayAHand::HandType::kHandPair:
+            type_index = rank - 1 + 15;
+            break;
+        case PlayAHand::HandType::kHandTriple:
+            type_index = rank - 1 + 15 + 13;
+            break;
+        case PlayAHand::HandType::kHandTripleSingle:
+            type_index = CardType::kThreeBindOne;
+            break;
+        case PlayAHand::HandType::kHandTriplePair:
+            type_index = CardType::kThreeBindPair;
+            break;
+        case PlayAHand::HandType::kHandPlane:
+        case PlayAHand::HandType::kHandPlaneTwoSingle:
+        case PlayAHand::HandType::kHandPlaneTwoPair:
+            type_index = CardType::kPlane;
+            break;
+        case PlayAHand::HandType::kHandSeqPair:
+            type_index = CardType::kSequencePair;
+            break;
+        case PlayAHand::HandType::kHandSeqSingle:
+            type_index = CardType::kSequence;
+            break;
+        case PlayAHand::HandType::kHandBomb:
+            type_index = CardType::kBomb;
+            break;
+        case PlayAHand::HandType::kHandBombJokers:
+            type_index = CardType::kJokerBomb;
+            break;
+        case PlayAHand::HandType::kHandBombSingle:
+        case PlayAHand::HandType::kHandBombPair:
+        case PlayAHand::HandType::kHandBombTwoSingle:
+        case PlayAHand::HandType::kHandBombJokersSingle:
+        case PlayAHand::HandType::kHandBombJokersPair:
+        case PlayAHand::HandType::kHandBombJokersTwoSingle:
+            type_index = CardType::kFourBindTwo;
+            break;
+        default:
+            break;
+    }
+    
+    if (!is_first && (type_index >= CardType::kPlane && type_index < CardType::kFourBindTwo)) {
+        current_index = CardType::kMoreBiger1 + QRandomGenerator::global()->bounded(2);
+    } else {
+        current_index = type_index;
     }
     
     media_player_[index]->setSource(play_list_[index][media_current_index_[index]]);
