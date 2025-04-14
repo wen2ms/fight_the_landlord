@@ -37,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(timer_, &QTimer::timeout, this, &MainWindow::on_deal_card);
     
     animation_window_ = new AnimationWindow(this);
+    bgm_ = new BGMControl(this);
 }
 
 MainWindow::~MainWindow() {
@@ -117,6 +118,7 @@ void MainWindow::init_buttons_group() {
         update_scores();
         
         game_status_process(GameControl::GameStatus::kDealingCard);
+        bgm_->start_bgm(80);
     });
     connect(ui->button_group, &ButtonGroup::play_a_hand, this, &MainWindow::on_user_play_a_hand);
     connect(ui->button_group, &ButtonGroup::pass, this, &MainWindow::on_user_pass);
@@ -275,6 +277,8 @@ void MainWindow::start_dealing_card() {
     ui->button_group->select_panel(ButtonGroup::Panel::kEmpty);
     
     timer_->start(10);
+    
+    bgm_->play_auxiliary_music(BGMControl::AuxiliaryMusic::kDealingCard);
 }
 
 void MainWindow::card_move_step(Player* current_player, int current_card_pos) {
@@ -448,6 +452,9 @@ void MainWindow::on_deal_card() {
             timer_->stop();
             
             game_status_process(GameControl::GameStatus::kBiddingLord);
+            
+            bgm_->stop_auxiliary_music();
+            
             return;
         }
     }
@@ -479,6 +486,8 @@ void MainWindow::on_player_status_changed(Player* player, GameControl::PlayerSta
             }
             break;
         case GameControl::PlayerStatus::kWin:
+            bgm_->stop_bgm();
+            
             context_map_[game_control_->left_robot()].is_front_side = true;
             context_map_[game_control_->right_robot()].is_front_side = true;
             
@@ -510,6 +519,7 @@ void MainWindow::on_bid_lord(Player* player, int points, bool is_first_bidding) 
     }
     
     context.info->show();
+    bgm_->player_bidding_music(points, (BGMControl::PlayerSex)player->sex(), is_first_bidding);
 }
 
 void MainWindow::on_play_a_hand(Player* player, Cards& cards) {    
@@ -535,9 +545,22 @@ void MainWindow::on_play_a_hand(Player* player, Cards& cards) {
     if (cards.is_empty()) {
         it->info->setPixmap(QPixmap(":/images/pass.png"));
         it->info->show();
+        bgm_->play_pass_music((BGMControl::PlayerSex)player->sex());
+    } else {
+        if (game_control_->pending_player() == player || game_control_->pending_player() == nullptr) {
+            bgm_->play_card_music(cards, (BGMControl::PlayerSex)player->sex(), true);
+        } else {
+            bgm_->play_card_music(cards, (BGMControl::PlayerSex)player->sex(), false);
+        }
     }
     
     update_player_cards(player);
+    
+    if (player->cards().cards_count() == 2) {
+        bgm_->play_last_cards_musice(BGMControl::CardType::kLast2, (BGMControl::PlayerSex)player->sex());
+    } else if (player->cards().cards_count() == 1) {
+        bgm_->play_last_cards_musice(BGMControl::CardType::kLast1, (BGMControl::PlayerSex)player->sex());
+    }
 }
 
 void MainWindow::on_card_selected(Qt::MouseButton button) {
@@ -562,6 +585,8 @@ void MainWindow::on_card_selected(Qt::MouseButton button) {
         } else {
             selected_cards_.erase(it);
         }
+        
+        bgm_->play_auxiliary_music(BGMControl::AuxiliaryMusic::kSelectCard);
         
     } else if (button == Qt::RightButton) {
         on_user_play_a_hand();
@@ -690,6 +715,8 @@ void MainWindow::show_end_panel() {
     end_panel->move((width() - end_panel->width()) / 2, -end_panel->height());
     end_panel->set_scores(player_list_[0]->score(), player_list_[1]->score(), player_list_[2]->score());
     
+    bgm_->play_ending_music(is_win);
+    
     QPropertyAnimation* animation = new QPropertyAnimation(end_panel, "geometry", this);
     animation->setDuration(1500);
     animation->setStartValue(QRect(end_panel->x(), end_panel->y(), end_panel->width(), end_panel->height()));
@@ -705,6 +732,7 @@ void MainWindow::show_end_panel() {
         
         ui->button_group->select_panel(ButtonGroup::Panel::kEmpty);
         game_status_process(GameControl::GameStatus::kDealingCard);
+        bgm_->start_bgm(80);
     });
 }
 
@@ -713,7 +741,7 @@ void MainWindow::init_count_down() {
     count_down_->move((width() - count_down_->width()) / 2, (height() - count_down_->height()) / 2 + 30);
     
     connect(count_down_, &CountDown::not_enough_time, this, [=]() {
-        
+        bgm_->play_auxiliary_music(BGMControl::AuxiliaryMusic::kAlert);
     });
     connect(count_down_, &CountDown::timeout, this, &MainWindow::on_user_pass);
     

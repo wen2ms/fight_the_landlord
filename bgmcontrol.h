@@ -88,7 +88,7 @@ class BGMControl : public QObject {
         kDealingCard,
         kSelectCard,
         kPlaneBackground,
-        kPBombBackground,
+        kBombBackground,
         kAlert
     };
     
@@ -130,6 +130,7 @@ class BGMControl : public QObject {
     void player_bidding_music(int points, PlayerSex sex, bool is_first);
     
     void play_card_music(Cards& cards, PlayerSex sex, bool is_first);
+    void play_last_cards_musice(CardType type, PlayerSex sex);
     
     void play_pass_music(PlayerSex sex);
     

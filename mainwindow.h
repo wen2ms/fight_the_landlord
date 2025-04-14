@@ -11,6 +11,7 @@
 #include "cardpanel.h"
 #include "animationwindow.h"
 #include "countdown.h"
+#include "bgmcontrol.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -134,5 +135,6 @@ class MainWindow : public QMainWindow {
     QHash<CardPanel*, QRect> user_cards_;
     
     CountDown* count_down_;
+    BGMControl* bgm_;
 };
 #endif  // MAINWINDOW_H

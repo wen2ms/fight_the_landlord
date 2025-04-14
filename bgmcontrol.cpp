@@ -5,6 +5,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QRandomGenerator>
+#include <QTimer>
 
 #include "playahand.h"
 
@@ -150,13 +151,32 @@ void BGMControl::play_card_music(Cards& cards, PlayerSex sex, bool is_first) {
             break;
     }
     
-    if (!is_first && (type_index >= CardType::kPlane && type_index < CardType::kFourBindTwo)) {
+    if (!is_first && (type_index >= CardType::kPlane && type_index <= CardType::kFourBindTwo)) {
         wrappers_list_[index]->set_index(CardType::kMoreBiger1 + QRandomGenerator::global()->bounded(2));
     } else {
         wrappers_list_[index]->set_index(type_index);
     }
     
     wrappers_list_[index]->play();
+    
+    if (type_index == CardType::kBomb || type_index == CardType::kJokerBomb) {
+        play_auxiliary_music(AuxiliaryMusic::kBombBackground);
+    } else if (type_index == CardType::kPlane) {
+        play_auxiliary_music(AuxiliaryMusic::kPlaneBackground);   
+    }
+}
+
+void BGMControl::play_last_cards_musice(CardType type, PlayerSex sex) {
+    int index = (sex == PlayerSex::kMale ? 0 : 1);
+    if (wrappers_list_[index]->player->playbackState() == QMediaPlayer::StoppedState) {
+        wrappers_list_[index]->set_index(type);
+        wrappers_list_[index]->play();
+    } else {
+        QTimer::singleShot(1500, this, [=]() {
+            wrappers_list_[index]->set_index(type);
+            wrappers_list_[index]->play();
+        });
+    }
 }
 
 void BGMControl::play_pass_music(PlayerSex sex) {
