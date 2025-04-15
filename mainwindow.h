@@ -67,7 +67,7 @@ class MainWindow : public QMainWindow {
     
     void on_bid_lord(Player* player, int points, bool is_first_bidding);
     
-    void on_play_a_hand(Player* player, Cards& cards);
+    void on_play_a_hand(Player* player, Cards cards);
     
     void on_card_selected(Qt::MouseButton button);
     

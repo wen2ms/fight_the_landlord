@@ -15,7 +15,7 @@ class BGMControl : public QObject {
     enum CardType
     {
         kThree,
-        kFoue,
+        kFour,
         kFive,
         kSix,
         kSeven,
@@ -31,8 +31,8 @@ class BGMControl : public QObject {
         kBigJoker,
 
         kThreeDouble,
-        kFoueDouble,
-        FiveDouble,
+        kFourDouble,
+        kFiveDouble,
         kSixDouble,
         kSevenDouble,
         kEightDouble,
@@ -45,7 +45,7 @@ class BGMControl : public QObject {
         kTowDouble,
         
         kThreeTriple,
-        kFoueTriple,
+        kFourTriple,
         kFiveTriple,
         kSixTriple,
         kSevenTriple,
@@ -123,7 +123,7 @@ class BGMControl : public QObject {
         
     void init_play_list();
     
-    void start_bgm(int volume);
+    void start_bgm(float volume);
     
     void stop_bgm();
     

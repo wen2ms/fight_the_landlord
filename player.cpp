@@ -2,7 +2,8 @@
 
 Player::Player(QObject *parent) : QObject{parent} {
     score_ = 0;
-    is_win_ = false;    
+    is_win_ = false;
+    pending_player_ = nullptr;     
 }
 
 Player::Player(QString name, QObject *parent) : Player(parent) {

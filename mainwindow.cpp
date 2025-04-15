@@ -118,7 +118,7 @@ void MainWindow::init_buttons_group() {
         update_scores();
         
         game_status_process(GameControl::GameStatus::kDealingCard);
-        bgm_->start_bgm(80);
+        bgm_->start_bgm(0.8);
     });
     connect(ui->button_group, &ButtonGroup::play_a_hand, this, &MainWindow::on_user_play_a_hand);
     connect(ui->button_group, &ButtonGroup::pass, this, &MainWindow::on_user_pass);
@@ -522,7 +522,7 @@ void MainWindow::on_bid_lord(Player* player, int points, bool is_first_bidding) 
     bgm_->player_bidding_music(points, (BGMControl::PlayerSex)player->sex(), is_first_bidding);
 }
 
-void MainWindow::on_play_a_hand(Player* player, Cards& cards) {    
+void MainWindow::on_play_a_hand(Player* player, Cards cards) {    
     auto it = context_map_.find(player);
     it->last_cards = cards;
     

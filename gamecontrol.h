@@ -78,7 +78,7 @@ class GameControl : public QObject {
     
     void game_status_changed(GameStatus status);
     
-    void notify_play_a_hand(Player* player, Cards& cards);
+    void notify_play_a_hand(Player* player, Cards cards);
     
     void pending_info(Player* player, Cards& cards);
     

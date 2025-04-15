@@ -9,9 +9,7 @@
 
 #include "playahand.h"
 
-BGMControl::BGMControl(QObject *parent) : QObject{parent} {
-    init_play_list();
-    
+BGMControl::BGMControl(QObject *parent) : QObject{parent} {    
     for (int i = 0; i < 5; ++i) {
         PlayerWrapper* wrapper = new PlayerWrapper;
         QMediaPlayer* player = new QMediaPlayer(this);
@@ -32,7 +30,7 @@ BGMControl::BGMControl(QObject *parent) : QObject{parent} {
             });
         }
         
-        audio_output->setVolume(1);
+        audio_output->setVolume(1.0);
         player->setAudioOutput(audio_output);
         
         wrapper->player = player;
@@ -40,6 +38,8 @@ BGMControl::BGMControl(QObject *parent) : QObject{parent} {
         
         wrappers_list_.push_back(wrapper);
     }
+    
+    init_play_list();
 }
 
 void BGMControl::init_play_list() {
@@ -64,10 +64,10 @@ void BGMControl::init_play_list() {
     }
 }
 
-void BGMControl::start_bgm(int volume) {
+void BGMControl::start_bgm(float volume) {
     wrappers_list_[2]->set_index(0);
     wrappers_list_[2]->audio_output->setVolume(volume);
-    wrappers_list_[2]->play();
+    wrappers_list_[2]->play();   
 }
 
 void BGMControl::stop_bgm() {

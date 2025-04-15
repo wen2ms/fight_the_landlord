@@ -204,7 +204,7 @@ Cards Strategy::first_play() {
 Cards Strategy::get_greater_cards(PlayAHand hand) {
     Player* pending_player = player_->pending_player();
     
-    if (pending_player->role() != player_->role() && pending_player->cards().cards_count() <= 3) {
+    if (pending_player != nullptr && pending_player->role() != player_->role() && pending_player->cards().cards_count() <= 3) {
         QVector<Cards> bombs = find_cards_by_count(4);
         
         for (int i = 0; i < bombs.size(); ++i) {
