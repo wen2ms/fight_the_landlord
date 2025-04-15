@@ -1,5 +1,7 @@
 #include "robot.h"
 
+#include <QDebug>
+
 #include "strategy.h"
 #include "robotbidlord.h"
 #include "robotplayahand.h"
@@ -11,12 +13,18 @@ Robot::Robot(QObject *parent) : Player{parent} {
 void Robot::prepare_bid_lord() {
     RobotBidLord* subthread = new RobotBidLord(this);
     
+    connect(subthread, &RobotBidLord::finished, this, [=]() {
+        subthread->deleteLater();
+    });
     subthread->start();
 }
 
 void Robot::prepare_play_a_hand() {
     RobotPlayAHand* subthread = new RobotPlayAHand(this);
     
+    connect(subthread, &RobotPlayAHand::finished, this, [=]() {
+        subthread->deleteLater();
+    });
     subthread->start();
 }
 

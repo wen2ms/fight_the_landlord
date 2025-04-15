@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     
     this->setWindowTitle("Fight The Landord");
     this->setFixedSize(1080, 720);
+    this->move(QApplication::primaryScreen()->availableGeometry().center() - this->rect().center());
     
     game_control_init();
     
