@@ -19,8 +19,13 @@ set(PROJECT_SOURCES
         mainwindow.ui
 )
 
+set(MACOSX_BUNDLE_ICON_FILE logo.icns)
+set(app_icon_macos "${CMAKE_CURRENT_SOURCE_DIR}/images/logo.icns")
+set_source_files_properties(${app_icon_macos} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(fight_the_landlord
+        MACOSX_BUNDLE 
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         card.h card.cpp
@@ -42,8 +47,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         endpanel.h endpanel.cpp
         countdown.h countdown.cpp
         bgmcontrol.h bgmcontrol.cpp
-        res.qrc
+        
         loading.h loading.cpp
+        ${app_icon_macos}
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET fight_the_landlord APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
