@@ -24,7 +24,8 @@ class Strategy {
     
     QVector<Cards> find_cards_by_type(PlayAHand hand, bool beat);
     
-    void pick_seq_singles(QVector<QVector<Cards>>& all_seq_list_record, QVector<Cards>& current_seq_single_list, const Cards& cards);
+    void pick_seq_singles(QVector<QVector<Cards>>& all_seq_list_record, const QVector<Cards>& current_seq_single_list,
+                          const Cards& cards);
     
     QVector<Cards> pick_optimal_seq_singles();
     
@@ -48,7 +49,7 @@ class Strategy {
     
     QVector<Cards> get_plane_two_single_or_two_pair(Card::CardRank rank_begin, PlayAHand::HandType hand_type);
     
-    QVector<Cards> get_seq_pair_or_seq_single(SeqCardsInfo& info);
+    QVector<Cards> get_seq_pair_or_seq_single(const SeqCardsInfo& info);
     
     Cards get_base_seq_pair(Card::CardRank rank);
     Cards get_base_seq_single(Card::CardRank rank);

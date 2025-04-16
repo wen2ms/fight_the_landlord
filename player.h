@@ -17,25 +17,25 @@ class Player : public QObject {
     explicit Player(QString name, QObject* parent = nullptr);
     
     void set_name(QString name);
-    QString name();
+    QString name() const;
     
     void set_role(Role role);
-    Role role();
+    Role role() const;
     
     void set_sex(Sex sex);
-    Sex sex();
+    Sex sex() const;
     
     void set_direction(Direction direction);
-    Direction direction();
+    Direction direction() const;
     
     void set_type(Type type);
-    Type type();
+    Type type() const;
     
     void set_score(int score);
-    int score();
+    int score() const;
     
     void set_win(bool flag);
-    bool is_win();
+    bool is_win() const;
     
     void set_prev_player(Player* player);
     void set_next_player(Player* player);
@@ -45,17 +45,17 @@ class Player : public QObject {
     
     void bid_lord(int points);
     
-    void store_dealt_card(Card& card);
-    void store_dealt_card(Cards& cards);
+    void store_dealt_card(const Card& card);
+    void store_dealt_card(const Cards& cards);
     
-    Cards cards();
+    Cards cards() const;
     
     void clear_cards();
     
     void play_a_hand(Cards& cards);
     
-    void set_pending_info(Player* player, Cards& cards);
-    Cards pending_cards();
+    void set_pending_info(Player* player, const Cards& cards);
+    Cards pending_cards() const;
     Player* pending_player();
     
     virtual void prepare_bid_lord();
@@ -64,9 +64,9 @@ class Player : public QObject {
   signals:
     void notify_bid_lord(Player* player, int points);
     
-    void notify_play_a_hand(Player* player, Cards cards);
+    void notify_play_a_hand(Player* player, Cards& cards);
     
-    void notify_got_cards(Player* player, Cards& cards);
+    void notify_got_cards(Player* player, const Cards& cards);
     
   protected:
     int score_;

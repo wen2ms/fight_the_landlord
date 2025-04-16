@@ -1,6 +1,7 @@
 #include "playahand.h"
 
-PlayAHand::PlayAHand() {}
+PlayAHand::PlayAHand() : hand_type_(HandType::kHandUnknown), card_rank_(Card::CardRank::kRankBegin),
+      extra_info_(0) {}
 
 PlayAHand::PlayAHand(Cards &cards) {
     classify(cards);
@@ -92,6 +93,9 @@ void PlayAHand::judge_card_type() {
     } else if (is_bomb_pair()) {
         hand_type_ = HandType::kHandBombPair;
         card_rank_ = four_card_[0];
+    } else if (is_bomb_two_single()) {
+        hand_type_ = HandType::kHandBombTwoSingle;
+        card_rank_ = four_card_[0];
     } else if (is_bomb_jokers()) {
         hand_type_ = HandType::kHandBombJokers;
     } else if (is_bomb_jokers_single()) {
@@ -103,19 +107,19 @@ void PlayAHand::judge_card_type() {
     }
 }
 
-PlayAHand::HandType PlayAHand::hand_type() {
+PlayAHand::HandType PlayAHand::hand_type() const {
     return hand_type_;
 }
 
-Card::CardRank PlayAHand::card_rank() {
+Card::CardRank PlayAHand::card_rank() const {
     return card_rank_;
 }
 
-int PlayAHand::extra_info() {
+int PlayAHand::extra_info() const {
     return extra_info_;
 }
 
-bool PlayAHand::can_beat(const PlayAHand &other) {
+bool PlayAHand::can_beat(const PlayAHand &other) const {
     if (hand_type_ == HandType::kHandUnknown) {
         return false;
     }

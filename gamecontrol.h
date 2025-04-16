@@ -50,12 +50,12 @@ class GameControl : public QObject {
     Player* current_player();
     
     Player* pending_player();
-    Cards pending_cards();
+    Cards pending_cards() const;
     
     void init_all_cards();
     
     Card take_one_card();
-    Cards take_remaining_cards();
+    Cards take_remaining_cards() const;
     
     void reset_all_cards();
     
@@ -65,11 +65,11 @@ class GameControl : public QObject {
     
     void clear_player_score();
     
-    int max_bidding_points();
+    int max_bidding_points() const;
     
     void on_bid_lord(Player* player, int points);
     
-    void on_play_a_hand(Player* player, Cards cards);
+    void on_play_a_hand(Player* player, Cards& cards);
 
   signals:
     void player_status_changed(Player* player, PlayerStatus status);

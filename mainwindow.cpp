@@ -309,8 +309,9 @@ void MainWindow::card_move_step(Player* current_player, int current_card_pos) {
     }
 }
 
-void MainWindow::dealt_card_process(Player* player, Cards& cards) {
-    Card::CardList cards_list = cards.to_card_list();
+void MainWindow::dealt_card_process(Player* player, const Cards& cards) {
+    Cards& my_cards = const_cast<Cards&>(cards);
+    Card::CardList cards_list = my_cards.to_card_list();
     for (int i = 0; i < cards_list.size(); ++i) {
         CardPanel* panel = card_map_[cards_list.at(i)];
         

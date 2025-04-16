@@ -1,12 +1,8 @@
 #include "strategy.h"
 
 #include <QMap>
-#include <QDebug>
 
-Strategy::Strategy(Player *player, const Cards &cards) {
-    player_ = player;
-    cards_ = cards;
-}
+Strategy::Strategy(Player *player, const Cards &cards) : player_(player), cards_(cards) {}
 
 Cards Strategy::make_strategy() {
     Player* pending_player = player_->pending_player();
@@ -229,7 +225,7 @@ Cards Strategy::get_greater_cards(PlayAHand hand) {
     
     remaining_cards.remove(Strategy(player_, remaining_cards).pick_optimal_seq_singles());
     
-    auto find_beat_card = std::bind([=](Cards& cards) {
+    auto find_beat_card = std::bind([=](const Cards& cards) {
         QVector<Cards> beat_cards_list = Strategy(player_, cards).find_cards_by_type(hand, true);
         
         if (!beat_cards_list.empty()) {
@@ -422,7 +418,7 @@ QVector<Cards> Strategy::find_cards_by_type(PlayAHand hand, bool beat) {
     }
 }
 
-void Strategy::pick_seq_singles(QVector<QVector<Cards> >& all_seq_list_record, QVector<Cards>& current_seq_single_list,
+void Strategy::pick_seq_singles(QVector<QVector<Cards> >& all_seq_list_record, const QVector<Cards>& current_seq_single_list,
                                 const Cards& cards) {
     QVector<Cards> all_seq_list = Strategy(player_, cards).find_cards_by_type(PlayAHand(PlayAHand::HandType::kHandSeqSingle,
                                                                                         Card::CardRank::kRankBegin, 0), false);
@@ -578,7 +574,7 @@ QVector<Cards> Strategy::get_plane_two_single_or_two_pair(Card::CardRank rank_be
     return find_cards_list;
 }
 
-QVector<Cards> Strategy::get_seq_pair_or_seq_single(SeqCardsInfo& info) {
+QVector<Cards> Strategy::get_seq_pair_or_seq_single(const SeqCardsInfo& info) {
     QVector<Cards> find_cards_list;
     
     if (info.beat) {

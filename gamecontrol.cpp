@@ -5,7 +5,8 @@
 
 #include "playahand.h"
 
-GameControl::GameControl(QObject *parent) : QObject{parent} {}
+GameControl::GameControl(QObject *parent) : QObject{parent}, left_robot_(nullptr), right_robot_(nullptr),
+      user_player_(nullptr), current_player_(nullptr), pending_player_(nullptr), bid_points_(0) {}
 
 void GameControl::player_init() {
     left_robot_ = new Robot("Robot Left", this);
@@ -75,7 +76,7 @@ Player *GameControl::pending_player() {
     return pending_player_;
 }
 
-Cards GameControl::pending_cards() {
+Cards GameControl::pending_cards() const {
     return pending_cards_;
 }
 
@@ -98,7 +99,7 @@ Card GameControl::take_one_card() {
     return all_cards_.take_random_card();   
 }
 
-Cards GameControl::take_remaining_cards() {
+Cards GameControl::take_remaining_cards() const {
     return all_cards_;
 }
 
@@ -145,7 +146,7 @@ void GameControl::clear_player_score() {
     user_player_->set_score(0);
 }
 
-int GameControl::max_bidding_points() {
+int GameControl::max_bidding_points() const {
     return bidding_record_.points;
 }
 
@@ -189,7 +190,7 @@ void GameControl::on_bid_lord(Player *player, int points) {
     current_player_->prepare_bid_lord();
 }
 
-void GameControl::on_play_a_hand(Player *player, Cards cards) {
+void GameControl::on_play_a_hand(Player *player, Cards& cards) {
     emit notify_play_a_hand(player, cards);
     
     if (!cards.is_empty()) {

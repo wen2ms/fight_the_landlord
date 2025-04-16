@@ -14,16 +14,16 @@ class CardPanel : public QWidget {
     explicit CardPanel(QWidget *parent = nullptr);
     
     void set_image(const QPixmap& front, const QPixmap& back);
-    QPixmap get_image();
+    QPixmap get_image() const;
     
     void set_front_side(bool is_front);
-    bool is_front_side();
+    bool is_front_side() const;
     
     void set_selected_side(bool is_selected);
-    bool is_selected();
+    bool is_selected() const;
     
-    void set_card(Card& card);
-    Card get_card();
+    void set_card(const Card& card);
+    Card get_card() const;
     
     void set_owner(Player* player);
     Player* get_owner();

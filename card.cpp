@@ -1,6 +1,6 @@
 #include "card.h"
 
-Card::Card() {}
+Card::Card() : suit_(CardSuit::kSuitBegin), rank_(CardRank::kRankBegin) {}
 
 Card::Card(CardSuit suit, CardRank rank) {
     set_suit(suit);

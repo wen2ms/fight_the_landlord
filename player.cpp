@@ -1,10 +1,7 @@
 #include "player.h"
 
-Player::Player(QObject *parent) : QObject{parent} {
-    score_ = 0;
-    is_win_ = false;
-    pending_player_ = nullptr;     
-}
+Player::Player(QObject *parent) : QObject{parent}, score_(0), is_win_(false), prev_player_(nullptr), next_player_(nullptr),
+      pending_player_(nullptr) {}
 
 Player::Player(QString name, QObject *parent) : Player(parent) {
     name_ = name;
@@ -14,7 +11,7 @@ void Player::set_name(QString name) {
     name_ = name;
 }
 
-QString Player::name() {
+QString Player::name() const {
     return name_;
 }
 
@@ -22,7 +19,7 @@ void Player::set_role(Role role) {
     role_ = role;
 }
 
-Player::Role Player::role() {
+Player::Role Player::role() const {
     return role_;
 }
 
@@ -30,7 +27,7 @@ void Player::set_sex(Sex sex) {
     sex_ = sex;
 }
 
-Player::Sex Player::sex() {
+Player::Sex Player::sex() const {
     return sex_;
 }
 
@@ -38,7 +35,7 @@ void Player::set_direction(Direction direction) {
     direction_ = direction;
 }
 
-Player::Direction Player::direction() {
+Player::Direction Player::direction() const {
     return direction_;
 }
 
@@ -46,7 +43,7 @@ void Player::set_type(Type type) {
     type_ = type;
 }
 
-Player::Type Player::type() {
+Player::Type Player::type() const {
     return type_;
 }
 
@@ -54,7 +51,7 @@ void Player::set_score(int score) {
     score_ = score;
 }
 
-int Player::score() {
+int Player::score() const {
     return score_;
 }
 
@@ -62,7 +59,7 @@ void Player::set_win(bool flag) {
     is_win_ = flag;
 }
 
-bool Player::is_win() {
+bool Player::is_win() const {
     return is_win_;
 }
 
@@ -86,7 +83,7 @@ void Player::bid_lord(int points) {
     emit notify_bid_lord(this, points);
 }
 
-void Player::store_dealt_card(Card& card) {
+void Player::store_dealt_card(const Card& card) {
     cards_.add(card);
     
     Cards cards(card);
@@ -94,13 +91,13 @@ void Player::store_dealt_card(Card& card) {
     emit notify_got_cards(this, cards);
 }
 
-void Player::store_dealt_card(Cards& cards) {
+void Player::store_dealt_card(const Cards& cards) {
     cards_.add(cards);
     
     emit notify_got_cards(this, cards);
 }
 
-Cards Player::cards() {
+Cards Player::cards() const {
     return cards_;
 }
 
@@ -114,12 +111,12 @@ void Player::play_a_hand(Cards& cards) {
     emit notify_play_a_hand(this, cards);
 }
 
-void Player::set_pending_info(Player* player, Cards& cards) {
+void Player::set_pending_info(Player* player, const Cards& cards) {
     pending_player_ = player;
     pending_cards_ = cards;
 }
 
-Cards Player::pending_cards() {
+Cards Player::pending_cards() const {
     return pending_cards_;
 }
 

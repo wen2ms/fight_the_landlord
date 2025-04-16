@@ -40,13 +40,13 @@ class PlayAHand {
     PlayAHand(Cards& cards);
     PlayAHand(HandType type, Card::CardRank rank, int extra_info);
     
-    HandType hand_type();
+    HandType hand_type() const;
     
-    Card::CardRank card_rank();
+    Card::CardRank card_rank() const;
     
-    int extra_info();
+    int extra_info() const;
     
-    bool can_beat(const PlayAHand& other);
+    bool can_beat(const PlayAHand& other) const;
     
   private:
     void classify(Cards& cards);
